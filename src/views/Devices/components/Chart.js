@@ -4,7 +4,8 @@ import { CardContent, Typography, Card, Link } from '@mui/material';
 import ReactEChart from "echarts-for-react";
 // import { LineChart } from '@mui/x-charts';
 
-export default function Chart({ deviceUID }) {
+export default function Chart({ deviceUID, data }) {
+  console.log(data)
   const eChartOptions = useMemo(
     () => ({
       responsive: true,
@@ -17,37 +18,20 @@ export default function Chart({ deviceUID }) {
       },
       xAxis: {
         scale: true,
-        name: 'Abc',
-        type: 'value',
-        min: 0,
-        max: 3,
+        name: 'Time',
+        type: 'time',
         nameLocation: 'middle',
         nameGap: 30,
-        axisLabel: {
-          hideOverlap: true,
-        },
         splitLine: {
           show: true,
-        },
-        minorTick: {
-          show: false,
         },
       },
       yAxis: {
         scale: true,
         name: 'Value',
         type: 'value',
-        axisTick: {
-          show: false,
-        },
         nameLocation: 'middle',
-        nameGap: 40,
-        splitLine: {
-          show: false,
-        },
-        minorTick: {
-          show: false,
-        },
+        nameGap: 60,
       },
       toolbox: {
         show: false,
@@ -65,22 +49,13 @@ export default function Chart({ deviceUID }) {
         },
       },
       dataset: {
-        dimensions: ['index', 'readValue'],
-        source: [
-          { index: 0, readValue: 0 },
-          {
-            index: 1,
-            readValue: 543,
-          },
-          {
-            index: 2,
-            readValue: 234,
-          },
-          {
-            index: 3,
-            readValue: 120,
-          },
-        ],
+        dimensions: ['time', 'value'],
+        source: data
+        .filter(e => !!e.sensor_data.value && e.sensor_data.value > 0)
+        .map(e => ({
+          time: new Date(e.sensor_data.time).getTime(),
+          value: e.sensor_data.value,
+        })),
       },
       series: [
         {
@@ -96,7 +71,7 @@ export default function Chart({ deviceUID }) {
         },
       ],
     }),
-    [],
+    [data],
   );
 
   return (
@@ -115,6 +90,7 @@ export default function Chart({ deviceUID }) {
           <Box display={'flex'} alignItems={'center'}>
             <ReactEChart
               option={eChartOptions}
+              showLoading={!data}
               style={{ height: '400px', width: '100%' }}
             />
           </Box>

@@ -70,6 +70,7 @@
     "hardhat-gas-reporter": "^1.0.8",
     "ipfs-http-client": "^57.0.1",
     "jarallax": "^2.0.3",
+    "mysql2": "^3.6.3",
     "net": "^1.0.2",
     "next": "^12.1.6",
     "prop-types": "^15.8.1",

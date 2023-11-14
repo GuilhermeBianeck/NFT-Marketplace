@@ -18,7 +18,6 @@ import { SpaceBar } from '@mui/icons-material';
 
 export default function DevicesItem({ tokenId }) {
   const theme = useTheme();
-  console.log(tokenId)
 
   const [nft, setNft] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -27,7 +26,7 @@ export default function DevicesItem({ tokenId }) {
 
   const getData = async (deviceUID) => {
     if (!deviceUID) return;
-    const result = axios.get(`/api/devices?deviceUid=${deviceUID}`);
+    const result = await axios.get(`/api/devices?deviceUid=${deviceUID}`);
     setData(result.data);
   }
 
@@ -43,7 +42,6 @@ export default function DevicesItem({ tokenId }) {
       provider,
     );
     const d = await marketContract.fetchMarketItems();
-    console.log(d)
 
     const tokenUri = await marketContract.tokenURI(String(tokenId));
     const meta = await axios.get(tokenUri);
@@ -81,7 +79,7 @@ export default function DevicesItem({ tokenId }) {
         </Typography>
         <ItemCard nft={nft} />
         <div style={{ height: 20 }} />
-        <Chart deviceUID={nft?.deviceUID} />
+        <Chart deviceUID={nft?.deviceUID} data={data || []} />
       </Container>
       <Box
         position={'relative'}
