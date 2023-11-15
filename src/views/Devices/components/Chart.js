@@ -2,6 +2,12 @@ import React, { useMemo } from 'react';
 import Box from '@mui/material/Box';
 import { CardContent, Typography, Card, Link } from '@mui/material';
 import ReactEChart from "echarts-for-react";
+import dynamic from 'next/dynamic'
+
+const DynamicReactEChart = dynamic(
+  ReactEChart,
+  { ssr: false }
+)
 // import { LineChart } from '@mui/x-charts';
 
 export default function Chart({ deviceUID, data }) {
@@ -88,7 +94,7 @@ export default function Chart({ deviceUID, data }) {
             Device: {deviceUID || ""}
           </Typography>
           <Box display={'flex'} alignItems={'center'}>
-            <ReactEChart
+            <DynamicReactEChart
               option={eChartOptions}
               showLoading={!data}
               style={{ height: '400px', width: '100%' }}
