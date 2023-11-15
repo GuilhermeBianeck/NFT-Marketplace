@@ -16,8 +16,10 @@ import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import Web3Modal from 'web3modal';
 import { ethers } from 'ethers';
 import Marketplace from 'contracts/Marketplace.sol/Marketplace.json';
+import { useRouter } from 'next/router';
 
 const PortfolioGrid = ({ data = [], buttonShow }) => {
+  const router = useRouter();
   const theme = useTheme();
 
   async function buyNft(nft) {
@@ -145,7 +147,8 @@ const PortfolioGrid = ({ data = [], buttonShow }) => {
                   </Box>
                   <CardActions sx={{ justifyContent: 'flex-end' }}>
                     <Button
-                      href={`/devices/${item.tokenId}`}
+                      // href={`/devices/${item.tokenId}`}
+                      onClick={() => router.push(`/devices/${item.tokenId}`)}
                     >
                       Devices
                     </Button>
