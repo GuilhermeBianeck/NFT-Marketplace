@@ -1,17 +1,17 @@
-import React, { useMemo } from 'react';
+"use client";
+import React, { useMemo, useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import { CardContent, Typography, Card, Link } from '@mui/material';
 import ReactEChart from "echarts-for-react";
-import dynamic from 'next/dynamic'
-
-const DynamicReactEChart = dynamic(
-  ReactEChart,
-  { ssr: false }
-)
 // import { LineChart } from '@mui/x-charts';
 
 export default function Chart({ deviceUID, data }) {
-  console.log(data)
+  const [isClient, setIsClient] = useState(false)
+ 
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
   const eChartOptions = useMemo(
     () => ({
       responsive: true,
@@ -94,11 +94,14 @@ export default function Chart({ deviceUID, data }) {
             Device: {deviceUID || ""}
           </Typography>
           <Box display={'flex'} alignItems={'center'}>
-            <DynamicReactEChart
-              option={eChartOptions}
-              showLoading={!data}
-              style={{ height: '400px', width: '100%' }}
-            />
+          {isClient &&
+              <ReactEChart
+                option={eChartOptions}
+                showLoading={!data}
+                style={{ height: '400px', width: '100%' }}
+                suppressHydrationWarning
+              />
+            }
           </Box>
         </CardContent>
       </Box>
