@@ -26,9 +26,11 @@ export default function DevicesItem({ tokenId }) {
 
   const getData = async (deviceUID) => {
     if (!deviceUID) return;
-    const result = await axios.get(`/api/devices?deviceUid=${deviceUID}`);
+    const result = await axios.get(
+      `https://www.bioma.cloud/api/devices?deviceUid=${deviceUID}`,
+    );
     setData(result.data);
-  }
+  };
 
   async function loadNFTs() {
     if (!tokenId) return;
@@ -45,11 +47,11 @@ export default function DevicesItem({ tokenId }) {
 
     const tokenUri = await marketContract.tokenURI(String(tokenId));
     const meta = await axios.get(tokenUri);
-    
+
     if (meta.data.deviceUID) {
       getData(meta.data.deviceUID);
     }
-    
+
     let item = {
       // price,
       tokenId: tokenId,
