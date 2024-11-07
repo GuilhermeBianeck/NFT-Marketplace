@@ -1,11 +1,3 @@
-<!-- PROJECT SHIELDS -->
-
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
-[![LinkedIn][linkedin-shield]][linkedin-url]
-
 <!-- PROJECT LOGO -->
 
 <br />
@@ -15,7 +7,7 @@
   </a>
 
   <h3 align="center">Plataforma de Monitoramento de Bioma e NFT</h3>
-  <a href="https://marketplace-46f99.web.app/">Link</a>
+  <a href="https://bioma.cloud/">Link</a>
 
 </div>
 
@@ -24,7 +16,7 @@
 ## About The Project
 
 <p align="left">
-    An awesome marketplace to turn your products or services into publicly tradeable items.
+    An awesome biome marketplace.
 </p>
 
 #### Network
@@ -33,10 +25,8 @@ Contract is deployed on Polygon mumbai network
 
 ```sh
 Marketplace Address: 0xFC825b8f07E465c32b199Ecf5b0f3B679A4285b0
-RPC URL: https://rpc-mumbai.maticvigil.com
+RPC URL: https://rpc.cardona.zkevm-rpc.com
 ```
-
-https://mumbai.polygonscan.com/address/0xFC825b8f07E465c32b199Ecf5b0f3B679A4285b0
 
 ### ⚙️Functions:
 
@@ -77,14 +67,14 @@ Below are instructions to get started
 3. Add environment variables, also you will require dedicated subdomain for IPFS from infura
    ```sh
    PRIVATE_KEY=
-   MUMBAI_URL= https://rpc-mumbai.maticvigil.com/
+   CORDANA_URL= https://rpc.cardona.zkevm-rpc.com/
    INFURA_IPFS_ID=
    INFURA_IPFS_SECRET=
    INFURA_IPFS_DOMAIN=
    ```
 4. Deploy smart contract
    ```sh
-   npx hardhat run scripts/deploy.js --network mumbai
+   npx hardhat run scripts/deploy.js --network cardona
    ```
 5. Run application
    ```sh
@@ -353,7 +343,7 @@ async function onChange(e) {
 ```javascript
 async function loadNFTs() {
   const provider = new ethers.providers.JsonRpcProvider(
-    'https://rpc-mumbai.maticvigil.com',
+    'https://rpc.cardona.zkevm-rpc.com',
   );
   const marketContract = new ethers.Contract(
     marketAddress,

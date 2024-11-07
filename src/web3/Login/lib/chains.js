@@ -207,6 +207,22 @@ const supportedChains = [
       contractAddress: '',
       balance: ''
     }
+  },
+  {
+    name: 'Polygon zkEVM Cardona Testnet',
+    short_name: 'cardona',
+    chain: 'smartchain',
+    network: 'cardona',
+    chain_id: 2442,
+    network_id: 2442,
+    rpc_url: 'https://rpc.cardona.zkevm-rpc.com/',
+    native_currency: {
+      symbol: 'ETH',
+      name: 'ETH',
+      decimals: '18',
+      contractAddress: '',
+      balance: ''
+    }
   }
 ]
 
