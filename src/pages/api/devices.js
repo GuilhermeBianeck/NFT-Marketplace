@@ -13,7 +13,7 @@ export default async (req, res) => {
       ...row,
       sensor_data: JSON.parse(row.sensor_data),
     }));
-    // console.log('result', result)
+    console.log('result', result)
     return res.json(formattedRows);
   } catch (error) {
     console.log(error);

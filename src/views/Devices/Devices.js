@@ -36,7 +36,7 @@ export default function DevicesItem({ tokenId }) {
     if (!tokenId) return;
     setLoading(true);
     const provider = new ethers.providers.JsonRpcProvider(
-      'https://rpc-mumbai.maticvigil.com/',
+      'https://rpc.cardona.zkevm-rpc.com/',
     );
     const marketContract = new ethers.Contract(
       process.env.MARKETPLACE_ADDRESS,
