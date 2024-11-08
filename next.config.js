@@ -7,7 +7,7 @@ module.exports = {
     INFURA_IPFS_SECRET: process.env.INFURA_IPFS_SECRET,
     INFURA_IPFS_DOMAIN: process.env.INFURA_IPFS_DOMAIN,
     PRIVATE_KEY: process.env.PRIVATE_KEY,
-    MUMBAI_URL: process.env.MUMBAI_URL,
+    CARDONA_URL: process.env.CARDONA_URL,
     MARKETPLACE_ADDRESS: process.env.MARKETPLACE_ADDRESS,
   },
 };
