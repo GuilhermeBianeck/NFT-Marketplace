@@ -28,7 +28,7 @@ export default function DevicesItem({ tokenId }) {
     if (!deviceUID) return;
     try {
       const result = await axios.get(
-        `http://localhost:3001/api/devices?deviceUid=${deviceUID}`,
+        `http://bioma.cloud/api/devices?deviceUid=${deviceUID}`,
       );
       setData(result.data);
     } catch (error) {

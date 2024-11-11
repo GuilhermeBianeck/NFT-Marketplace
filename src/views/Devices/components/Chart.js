@@ -12,7 +12,6 @@ function encodeBase64(str) {
     .replace(/=+$/, '');  // Remove any trailing `=`
 }
 
-
 // Function to calculate the AQI as an integer
 function calculateAQI(conc, pollutant) {
   let C_low, C_high, I_low, I_high;
