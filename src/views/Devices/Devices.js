@@ -18,18 +18,22 @@ import { SpaceBar } from '@mui/icons-material';
 
 export default function DevicesItem({ tokenId }) {
   const theme = useTheme();
-
   const [nft, setNft] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [data, setData] = useState([]);
+  const POLLING_INTERVAL = 15000; // Poll every 5 seconds
 
-  const [data, setData] = useState(null);
-
+  // Fetch device data based on deviceUID
   const getData = async (deviceUID) => {
     if (!deviceUID) return;
-    const result = await axios.get(
-      `https://www.bioma.cloud/api/devices?deviceUid=${deviceUID}`,
-    );
-    setData(result.data);
+    try {
+      const result = await axios.get(
+        `http://localhost:3001/api/devices?deviceUid=${deviceUID}`,
+      );
+      setData(result.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
 
   async function loadNFTs() {
@@ -43,7 +47,6 @@ export default function DevicesItem({ tokenId }) {
       Marketplace.abi,
       provider,
     );
-    const d = await marketContract.fetchMarketItems();
 
     const tokenUri = await marketContract.tokenURI(String(tokenId));
     const meta = await axios.get(tokenUri);
@@ -52,9 +55,8 @@ export default function DevicesItem({ tokenId }) {
       getData(meta.data.deviceUID);
     }
 
-    let item = {
-      // price,
-      tokenId: tokenId,
+    const item = {
+      tokenId,
       image: meta.data.image,
       name: meta.data.name,
       description: meta.data.description,
@@ -68,6 +70,15 @@ export default function DevicesItem({ tokenId }) {
   useEffect(() => {
     loadNFTs();
   }, [tokenId]);
+
+  // Polling Effect: Start polling for new data if deviceUID exists
+  useEffect(() => {
+    if (nft?.deviceUID) {
+      getData(nft.deviceUID); // Fetch initial data
+      const interval = setInterval(() => getData(nft.deviceUID), POLLING_INTERVAL);
+      return () => clearInterval(interval); // Clear interval on component unmount
+    }
+  }, [nft?.deviceUID]);
 
   return (
     <Main>

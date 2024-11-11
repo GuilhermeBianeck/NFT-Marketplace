@@ -10,13 +10,13 @@ export default async (req, res) => {
     }
 
     const [rows] = await executeQuery({
-      query: 'SELECT * FROM Device WHERE device_uid = ?',
-      values: [deviceUid],
+      query: `
+        SELECT * FROM Device 
+        WHERE device_uid = ? 
+        AND id >= (SELECT MAX(id) FROM Device WHERE device_uid = ?) - 5000
+      `,
+      values: [deviceUid, deviceUid],
     });
-
-    if (rows.length === 0) {
-      return res.status(404).json({ error: 'Device not found' });
-    }
 
     const formattedRows = rows.map((row) => ({
       ...row,
