@@ -13,7 +13,7 @@ export default async (req, res) => {
       query: `
         SELECT * FROM Device 
         WHERE device_uid = ? 
-        AND id >= (SELECT MAX(id) FROM Device WHERE device_uid = ?) - 5000
+        AND id >= (SELECT MAX(id) FROM Device WHERE device_uid = ?) - 50000
       `,
       values: [deviceUid, deviceUid],
     });
