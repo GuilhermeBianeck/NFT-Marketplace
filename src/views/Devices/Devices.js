@@ -27,7 +27,7 @@ const getData = async (deviceUID) => {
   if (!deviceUID) return;
   try {
     const result = await axios.get(
-      `https://www.bioma.cloud/api/devices?deviceUid=${deviceUID}&limit=50000`
+      `https://www.bioma.cloud/api/devices?deviceUid=${deviceUID}&limit=4000`
     );
     setData(result.data);
   } catch (error) {
