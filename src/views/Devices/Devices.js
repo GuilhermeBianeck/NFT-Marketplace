@@ -23,18 +23,17 @@ export default function DevicesItem({ tokenId }) {
   const [data, setData] = useState([]);
   const POLLING_INTERVAL = 15000; // Poll every 5 seconds
 
-  // Fetch device data based on deviceUID
-  const getData = async (deviceUID) => {
-    if (!deviceUID) return;
-    try {
-      const result = await axios.get(
-        `https://www.bioma.cloud/api/devices?deviceUid=${deviceUID}`,
-      );
-      setData(result.data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
+const getData = async (deviceUID) => {
+  if (!deviceUID) return;
+  try {
+    const result = await axios.get(
+      `https://www.bioma.cloud/api/devices?deviceUid=${deviceUID}&limit=50000`
+    );
+    setData(result.data);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+};
 
   async function loadNFTs() {
     if (!tokenId) return;

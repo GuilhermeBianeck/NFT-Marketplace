@@ -1,4 +1,4 @@
-describe('NFTMarket', function () {
+describe('Bioma', function () {
   it('Should interact with the token contract', async function () {
     const marketplaceContract = await ethers.getContractFactory('Marketplace');
     const marketplace = await marketplaceContract.deploy();
