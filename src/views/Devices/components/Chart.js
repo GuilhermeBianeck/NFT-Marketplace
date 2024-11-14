@@ -164,7 +164,7 @@ export default function Chart({ deviceUID, data }) {
               <Grid container spacing={2}>
                 <Grid item xs={6}>
                   <Typography variant="body1">AQI:</Typography>
-                  <Box sx={{ backgroundColor: aqiColor, color: 'white', padding: '4px 8px', borderRadius: '4px', fontWeight: 'bold' }}>
+                  <Box sx={{ backgroundColor: aqiColor, color: 'black', padding: '4px 8px', borderRadius: '4px', fontWeight: 'bold' }}>
                     {overallAqi}
                   </Box>
                 </Grid>
