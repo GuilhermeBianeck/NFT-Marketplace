@@ -15,7 +15,6 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 
-
 const FeaturedNfts = ({ data = [] }) => {
   const theme = useTheme();
   const isMd = useMediaQuery(theme.breakpoints.up('md'), { defaultMatches: true });
@@ -23,6 +22,7 @@ const FeaturedNfts = ({ data = [] }) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedSensor, setSelectedSensor] = useState({});
   
+  // Flag to toggle the visibility of the slider (Featured NFTs)
   const showFeaturedNfts = false; // Change to true to display the slider
 
   const handleSensorClick = (sensorDetails) => {
@@ -119,7 +119,7 @@ const FeaturedNfts = ({ data = [] }) => {
                     textDecoration: 'none',
                     transition: 'all .2s ease-in-out',
                     '&:hover': {
-                      transform: `translateY(-${theme.spacing(1 / 2)})`,
+                      transform: translateY(-${theme.spacing(1 / 2)}),
                     },
                   }}
                 >
@@ -198,3 +198,9 @@ const FeaturedNfts = ({ data = [] }) => {
     </Box>
   );
 };
+
+FeaturedNfts.propTypes = {
+  data: PropTypes.array,
+};
+
+export default FeaturedNfts;
