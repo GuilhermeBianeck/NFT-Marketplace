@@ -31,8 +31,8 @@ const Footer = () => {
               component={'img'}
               src={
                 mode === 'light'
-                  ? 'https://svgshare.com/i/zYS.svg'
-                  : 'https://svgshare.com/i/zYS.svg'
+                  ? 'https://raw.githubusercontent.com/GuilhermeBianeck/NFT-Marketplace/refs/heads/main/images/IoTTree.svg'
+                  : 'https://raw.githubusercontent.com/GuilhermeBianeck/NFT-Marketplace/refs/heads/main/images/IoTTree.svg'
               }
               height={1}
               width={1}

@@ -29,8 +29,8 @@ const Topbar = ({ onSidebarOpen, pages, colorInvert = false }) => {
           component={'img'}
           src={
             mode === 'light' && !colorInvert
-              ? 'https://svgshare.com/i/zYS.svg'
-              : 'https://svgshare.com/i/zYS.svg'
+              ? 'https://raw.githubusercontent.com/GuilhermeBianeck/NFT-Marketplace/refs/heads/main/images/IoTTree.svg'
+              : 'https://raw.githubusercontent.com/GuilhermeBianeck/NFT-Marketplace/refs/heads/main/images/IoTTree.svg'
           }
           height={0.5}
           width={0.5}
