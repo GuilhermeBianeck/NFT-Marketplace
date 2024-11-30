@@ -47,7 +47,7 @@ const Hero = () => {
               <Box
                 component={'img'}
                 src={
-                  'https://svgshare.com/i/zaR.svg'
+                  'https://raw.githubusercontent.com/GuilhermeBianeck/NFT-Marketplace/refs/heads/main/images/biomacloud.svg'
                 }
                 width={1}
                 height={1}
