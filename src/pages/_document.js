@@ -12,7 +12,7 @@ export default class MyDocument extends Document {
           <meta charSet="utf-8" />
           <link
             rel="shortcut icon"
-            href="https://svgshare.com/i/zYS.svg"
+            href="https://raw.githubusercontent.com/GuilhermeBianeck/NFT-Marketplace/refs/heads/main/images/IoTTree.svg"
           />
           <meta name="theme-color" content="#ffffff" />
           <meta
@@ -27,7 +27,7 @@ export default class MyDocument extends Document {
           <meta property="og:type" content="website" />
           <meta
             property="og:image"
-            content="hhttps://svgshare.com/i/zYS.svg"
+            content="https://raw.githubusercontent.com/GuilhermeBianeck/NFT-Marketplace/refs/heads/main/images/biomacloud.svg"
           />
           <meta
             property="og:title"
@@ -43,7 +43,7 @@ export default class MyDocument extends Document {
           />
           <link rel="preconnect" href="https://fonts.gstatic.com" />
           <link
-            href="https://svgshare.com/i/zYS.svg"
+            href="https://raw.githubusercontent.com/GuilhermeBianeck/NFT-Marketplace/refs/heads/main/images/biomacloud.svg"
             rel="stylesheet"
           />
         </Head>
