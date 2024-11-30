@@ -22,16 +22,17 @@ const FeaturedNfts = ({ data = [] }) => {
 
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedSensor, setSelectedSensor] = useState({});
+  
+  const showFeaturedNfts = false; // Change to true to display the slider
 
+  const handleSensorClick = (sensorDetails) => {
+    setSelectedSensor(sensorDetails);
+    setOpenDialog(true);
+  };
 
-const handleSensorClick = (sensorDetails) => {
-  setSelectedSensor(sensorDetails);
-  setOpenDialog(true);
-};
-
-const handleCloseDialog = () => {
-  setOpenDialog(false);
-};
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
 
   const sliderOpts = {
     dots: true,
@@ -104,149 +105,96 @@ const handleCloseDialog = () => {
           </Button>
         </Box>
       </Box>
-      <Box maxWidth={{ xs: 420, sm: 620, md: 1 }} margin={'0 auto'}>
-        <Slider {...sliderOpts}>
-          {data.map((item, i) => (
-            <Box key={i} padding={{ xs: 1, md: 2, lg: 3 }}>
-              <Box
-                display={'block'}
-                width={1}
-                height={1}
-                sx={{
-                  textDecoration: 'none',
-                  transition: 'all .2s ease-in-out',
-                  '&:hover': {
-                    transform: `translateY(-${theme.spacing(1 / 2)})`,
-                  },
-                }}
-              >
+      {/* Conditionally render the slider */}
+      {showFeaturedNfts && (
+        <Box maxWidth={{ xs: 420, sm: 620, md: 1 }} margin={'0 auto'}>
+          <Slider {...sliderOpts}>
+            {data.map((item, i) => (
+              <Box key={i} padding={{ xs: 1, md: 2, lg: 3 }}>
                 <Box
-                  component={Card}
+                  display={'block'}
                   width={1}
                   height={1}
-                  display={'flex'}
-                  flexDirection={'column'}
-                  sx={{ backgroundImage: 'none' }}
+                  sx={{
+                    textDecoration: 'none',
+                    transition: 'all .2s ease-in-out',
+                    '&:hover': {
+                      transform: `translateY(-${theme.spacing(1 / 2)})`,
+                    },
+                  }}
                 >
-                  <CardMedia
-                    title={item.name}
-                    image={item.image}
-                    sx={{
-                      position: 'relative',
-                      height: { xs: 240, sm: 340, md: 280 },
-                      overflow: 'hidden',
-                    }}
+                  <Box
+                    component={Card}
+                    width={1}
+                    height={1}
+                    display={'flex'}
+                    flexDirection={'column'}
+                    sx={{ backgroundImage: 'none' }}
                   >
-                    <Box
-                      component={'svg'}
-                      preserveAspectRatio="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      x="0px"
-                      y="0px"
-                      viewBox="0 0 1921 273"
+                    <CardMedia
+                      title={item.name}
+                      image={item.image}
                       sx={{
-                        position: 'absolute',
-                        width: '100%',
-                        left: 0,
-                        bottom: 0,
-                        right: 0,
-                        zIndex: 1,
+                        position: 'relative',
+                        height: { xs: 240, sm: 340, md: 280 },
+                        overflow: 'hidden',
                       }}
-                    >
-                      <polygon
-                        fill={theme.palette.background.paper}
-                        points="0,273 1921,273 1921,0 "
-                      />
-                    </Box>
-                    <Box
-                      display={'flex'}
-                      justifyContent={'space-between'}
-                      position={'absolute'}
-                      bottom={0}
-                      padding={2}
-                      width={1}
-                      zIndex={2}
-                    >
-                      <Box
-                        padding={1}
-                        bgcolor={'background.paper'}
-                        boxShadow={1}
-                        borderRadius={2}
+                    />
+                    <CardContent>
+                      <Typography
+                        variant={'h6'}
+                        gutterBottom
+                        align={'left'}
+                        sx={{ fontWeight: 700 }}
                       >
-                        <Typography sx={{ fontWeight: 600 }}>
-                          {item.price} ETH
+                        {item.name}
+                      </Typography>
+                      <Box marginTop={2} display={'flex'} alignItems={'center'}>
+                        <Typography variant={'subtitle1'} color="text.secondary">
+                          {item.description}
                         </Typography>
                       </Box>
-                    </Box>
-                  </CardMedia>
-                  <CardContent>
-                    <Typography
-                      variant={'h6'}
-                      gutterBottom
-                      align={'left'}
-                      sx={{ fontWeight: 700 }}
-                    >
-                      {item.name}
-                    </Typography>
-                    <Box marginTop={2} display={'flex'} alignItems={'center'}>
-                      <Typography variant={'subtitle1'} color="text.secondary">
-                        {item.description}
-                      </Typography>
-                    </Box>
-                  </CardContent>
-                  <Box flexGrow={1} />
-                  <CardActions sx={{ justifyContent: 'flex-end' }}>
-                    <Button>Link para NFT</Button>
-                    {/* Render 'Detalhes do Sensor' button only if sensorDetails are available */}
-                    {item.sensorDetails && (
-                      <Button 
-                        variant="contained" 
-                        color="secondary" 
-                        onClick={() => handleSensorClick(item.sensorDetails)}
-                      >
-                        Detalhes do Sensor
-                      </Button>
-                    )}
-                  </CardActions>
-
-
+                    </CardContent>
+                    <Box flexGrow={1} />
+                    <CardActions sx={{ justifyContent: 'flex-end' }}>
+                      <Button>Link para NFT</Button>
+                      {item.sensorDetails && (
+                        <Button
+                          variant="contained"
+                          color="secondary"
+                          onClick={() => handleSensorClick(item.sensorDetails)}
+                        >
+                          Detalhes do Sensor
+                        </Button>
+                      )}
+                    </CardActions>
+                  </Box>
                 </Box>
               </Box>
-            </Box>
-          ))}
-        </Slider>
-<Dialog open={openDialog} onClose={handleCloseDialog}>
-  <DialogContent>
-    <DialogContentText>
-      {/* Display sensor details if available */}
-      {selectedSensor && (
-        <>
-          Sensor: {selectedSensor.name || 'N/A'}
-          <br />
-          Type: {selectedSensor.type || 'N/A'}
-          {/* Additional details can be added here */}
-        </>
+            ))}
+          </Slider>
+          <Dialog open={openDialog} onClose={handleCloseDialog}>
+            <DialogContent>
+              <DialogContentText>
+                {selectedSensor && (
+                  <>
+                    Sensor: {selectedSensor.name || 'N/A'}
+                    <br />
+                    Type: {selectedSensor.type || 'N/A'}
+                  </>
+                )}
+              </DialogContentText>
+            </DialogContent>
+            {selectedSensor && (selectedSensor.name || selectedSensor.type) && (
+              <DialogActions>
+                <Button onClick={handleCloseDialog} color="primary">
+                  Fechar
+                </Button>
+              </DialogActions>
+            )}
+          </Dialog>
+        </Box>
       )}
-    </DialogContentText>
-  </DialogContent>
-  {/* Render the Close button only if the sensor object exists and has name or type */}
-  {selectedSensor && (selectedSensor.name || selectedSensor.type) && (
-    <DialogActions>
-      <Button onClick={handleCloseDialog} color="primary">
-        Fechar
-      </Button>
-    </DialogActions>
-  )}
-</Dialog>
-
-
-      </Box>
     </Box>
   );
 };
-
-FeaturedNfts.propTypes = {
-  data: PropTypes.array,
-};
-
-export default FeaturedNfts;
