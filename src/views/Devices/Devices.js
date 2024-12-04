@@ -21,13 +21,13 @@ export default function DevicesItem({ tokenId }) {
   const [nft, setNft] = useState(null);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
-  const POLLING_INTERVAL = 20000; // Poll every 5 seconds
+  const POLLING_INTERVAL = 5000; // Poll every 5 seconds
 
 const getData = async (deviceUID) => {
   if (!deviceUID) return;
   try {
     const result = await axios.get(
-      `https://www.bioma.cloud/api/devices?deviceUid=${deviceUID}&limit=50000`
+      `https://www.bioma.cloud/api/devices?deviceUid=${deviceUID}&limit=10000`
     );
     setData(result.data);
   } catch (error) {
