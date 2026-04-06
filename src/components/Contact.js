@@ -49,7 +49,8 @@ const Contact = () => {
               variant="contained"
               color="primary"
               size="large"
-              sx={{ minHeight: 56 }}
+              sx={{ minHeight: 56, whiteSpace: 'nowrap', px: 4 }}
+              fullWidth={false}
             >
               Subscribe
             </Button>

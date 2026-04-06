@@ -114,9 +114,9 @@ export default function Admin() {
             <Card><CardContent>
               <Typography variant="h6" gutterBottom>Listing Fee</Typography>
               <Typography variant="body2" color="text.secondary" mb={2}>Current: {listingPrice} POL</Typography>
-              <Box display="flex" gap={1}>
-                <TextField label="New fee (POL)" size="small" value={newListingPrice} onChange={(e) => setNewListingPrice(e.target.value)} />
-                <Button variant="contained" onClick={() => { const p = ethers.utils.parseEther(newListingPrice); execTx('listingPrice', () => writeContract.updateListingPrice(p)); }} disabled={loading === 'listingPrice' || !newListingPrice}>
+              <Box display="flex" gap={1} alignItems="flex-start">
+                <TextField label="New fee (POL)" size="small" value={newListingPrice} onChange={(e) => setNewListingPrice(e.target.value)} sx={{ flex: 1 }} />
+                <Button variant="contained" onClick={() => { const p = ethers.utils.parseEther(newListingPrice); execTx('listingPrice', () => writeContract.updateListingPrice(p)); }} disabled={loading === 'listingPrice' || !newListingPrice} sx={{ minHeight: 40 }}>
                   Update
                 </Button>
               </Box>
@@ -127,9 +127,9 @@ export default function Admin() {
             <Card><CardContent>
               <Typography variant="h6" gutterBottom>Ownership</Typography>
               <Typography variant="body2" color="text.secondary" mb={2} sx={{ wordBreak: 'break-all' }}>Owner: {owner}</Typography>
-              <Box display="flex" gap={1}>
+              <Box display="flex" gap={1} alignItems="flex-start">
                 <TextField label="New owner address" size="small" fullWidth value={newOwnerAddr} onChange={(e) => setNewOwnerAddr(e.target.value)} />
-                <Button variant="contained" onClick={() => execTx('transfer', () => writeContract.transferOwnership(newOwnerAddr))} disabled={loading === 'transfer' || !newOwnerAddr}>
+                <Button variant="contained" onClick={() => execTx('transfer', () => writeContract.transferOwnership(newOwnerAddr))} disabled={loading === 'transfer' || !newOwnerAddr} sx={{ minHeight: 40, whiteSpace: 'nowrap' }}>
                   Transfer
                 </Button>
               </Box>

@@ -1,6 +1,8 @@
 import React from 'react';
 import Box from '@mui/material/Box';
 import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
 import { useTheme } from '@mui/material/styles';
 
 import Main from 'layouts/Main';
@@ -20,14 +22,33 @@ const Home = () => {
       <Container>
         <Hero />
       </Container>
+      {!loaded && !error && (
+        <Box display="flex" justifyContent="center" py={6}>
+          <CircularProgress />
+        </Box>
+      )}
       {error && (
         <Container paddingY={'0 !important'}>
-          <Alert severity="error">{error}</Alert>
+          <Alert severity="warning" sx={{ mb: 2 }}>
+            Unable to load biomes. Please check your connection and try again.
+          </Alert>
         </Container>
       )}
       {loaded && nfts.length > 0 && (
         <Container>
           <FeaturedNfts />
+        </Container>
+      )}
+      {loaded && nfts.length === 0 && !error && (
+        <Container>
+          <Box textAlign="center" py={4}>
+            <Alert severity="info" sx={{ mb: 2 }}>
+              No biomes listed yet. Be the first to create one!
+            </Alert>
+            <Button variant="contained" href="/create">
+              Create a Biome
+            </Button>
+          </Box>
         </Container>
       )}
       <Box

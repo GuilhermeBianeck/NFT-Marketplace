@@ -4,6 +4,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
 import { HERO_IMAGE_URL } from 'config';
 
 const Hero = () => {
@@ -50,6 +51,24 @@ const Hero = () => {
             >
               A platform for environmental preservation powered by blockchain technology.
             </Typography>
+            <Box display="flex" gap={2} marginTop={3} flexWrap="wrap">
+              <Button
+                variant="contained"
+                color="primary"
+                size="large"
+                href="/allNfts"
+              >
+                Explore Biomes
+              </Button>
+              <Button
+                variant="outlined"
+                color="primary"
+                size="large"
+                href="/create"
+              >
+                Create a Biome
+              </Button>
+            </Box>
           </Box>
         </Grid>
         <Grid item xs={12} md={6}>

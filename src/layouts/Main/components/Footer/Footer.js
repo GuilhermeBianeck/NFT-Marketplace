@@ -15,26 +15,21 @@ const Footer = () => {
           alignItems="center"
           width={1}
           flexDirection={{ xs: 'column', sm: 'row' }}
+          gap={{ xs: 2, sm: 0 }}
         >
           <Box display="flex" component="a" href="/" title="Bioma" width={110}>
             <Box component="img" src={LOGO_URL} alt="Bioma - Logo" height={1} width={1} />
           </Box>
-          <Box display="flex" flexWrap="wrap" alignItems="center">
-            <Box marginTop={1} marginRight={2}>
-              <Link underline="none" component="a" href="/" color="text.primary" variant="subtitle2">
-                Home
-              </Link>
-            </Box>
-            <Box marginTop={1} marginRight={2}>
-              <Link underline="none" component="a" href="/allNfts" color="text.primary" variant="subtitle2">
-                Marketplace
-              </Link>
-            </Box>
-            <Box marginTop={1}>
-              <Link underline="none" component="a" href="#" color="text.primary" variant="subtitle2">
-                Privacy
-              </Link>
-            </Box>
+          <Box display="flex" flexWrap="wrap" alignItems="center" gap={2}>
+            <Link underline="none" component="a" href="/" color="text.primary" variant="subtitle2">
+              Home
+            </Link>
+            <Link underline="none" component="a" href="/allNfts" color="text.primary" variant="subtitle2">
+              Marketplace
+            </Link>
+            <Link underline="none" component="a" href="#" color="text.primary" variant="subtitle2">
+              Privacy
+            </Link>
           </Box>
         </Box>
       </Grid>

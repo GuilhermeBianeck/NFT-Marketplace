@@ -27,6 +27,7 @@ const FeaturedNfts = () => {
           align="center"
           data-aos="fade-up"
           gutterBottom
+          sx={{ fontWeight: 700 }}
         >
           Explore the Best Biomes
         </Typography>

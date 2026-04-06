@@ -1,7 +1,9 @@
 import React from 'react';
 import Box from '@mui/material/Box';
 import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
 import { useTheme } from '@mui/material/styles';
 
 import Main from 'layouts/Main';
@@ -30,8 +32,16 @@ const Listings = () => {
           <Alert severity="info">Connect your wallet to view your listings.</Alert>
         )}
         {error && <Alert severity="error">{error}</Alert>}
+        {web3Provider && !loaded && !error && (
+          <Box display="flex" justifyContent="center" py={8}>
+            <CircularProgress />
+          </Box>
+        )}
         {loaded && nfts.length === 0 && web3Provider && (
-          <Alert severity="info">You don't have any items listed.</Alert>
+          <Box textAlign="center" py={2}>
+            <Alert severity="info" sx={{ mb: 2 }}>You don't have any items listed yet.</Alert>
+            <Button variant="contained" href="/assets">Go to My Assets</Button>
+          </Box>
         )}
         {loaded && nfts.length > 0 && (
           <PortfolioGrid data={nfts} showSellerActions={true} onRefresh={reload} />

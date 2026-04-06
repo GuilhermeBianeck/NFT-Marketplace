@@ -31,16 +31,12 @@ const DialogBox = ({
           paddingX: { xs: 4, sm: 12 },
         }}
       >
-        <TokenIcon sx={{ fontSize: 60 }} />
-        <Typography align={'center'}>
-          <Typography component={'span'} fontWeight={700}>
-            {title}
-          </Typography>
+        <TokenIcon sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
+        <Typography variant="h5" align="center" fontWeight={700} gutterBottom>
+          {title}
         </Typography>
-        <Typography align={'center'}>
-          <Typography component={'span'} fontWeight={500}>
-            {message}
-          </Typography>
+        <Typography variant="body1" align="center" color="text.secondary" fontWeight={500}>
+          {message}
         </Typography>
         <Grid container spacing={2} sx={{ marginY: 4 }}>
           <Grid item xs={12}>

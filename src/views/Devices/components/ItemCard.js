@@ -39,7 +39,7 @@ export default function ItemCard({ nft }) {
               borderRadius={2}
             >
               <Typography sx={{ fontWeight: 600 }}>
-                {nft?.price} MATIC
+                {nft?.price} POL
               </Typography>
             </Box>
           </Box>
@@ -53,24 +53,11 @@ export default function ItemCard({ nft }) {
               {nft?.description}
             </Typography>
           </Box>
-          <Box display={'flex'} alignItems={'center'}>
-            <Box
-              component={'svg'}
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              width={16}
-              height={16}
-              marginRight={1}
-            >
-              <LinkIcon />
-            </Box>
-            <Typography variant={'subtitle2'} color="text.secondary">
-              <Link href={nft?.address} underline="none">
-                Link to NFT
-              </Link>
-            </Typography>
+          <Box display={'flex'} alignItems={'center'} gap={0.5}>
+            <LinkIcon sx={{ width: 16, height: 16, color: 'text.secondary' }} />
+            <Link href={nft?.address} underline="hover" variant="subtitle2" color="text.secondary">
+              Link to NFT
+            </Link>
           </Box>
         </CardContent>
       </Box>

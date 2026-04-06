@@ -23,7 +23,7 @@ const NFTCard = ({ item, direction = 'column', theme }) => (
       },
     }}
   >
-    <Box sx={{ p: 4, mb: 2 }}>
+    <Box sx={{ mb: 2 }}>
       <Box
         component={LazyLoadImage}
         effect="blur"
@@ -33,6 +33,7 @@ const NFTCard = ({ item, direction = 'column', theme }) => (
         maxWidth={1}
         sx={{
           filter: theme.palette.mode === 'dark' ? 'brightness(0.7)' : 'none',
+          borderRadius: 2,
         }}
       />
     </Box>
