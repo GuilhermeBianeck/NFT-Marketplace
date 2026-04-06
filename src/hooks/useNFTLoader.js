@@ -62,7 +62,7 @@ export default function useNFTLoader(fetchMethod = 'fetchMarketItems', options =
       setLoaded(true);
     } catch (err) {
       console.error(`Error loading NFTs (${fetchMethod}):`, err);
-      setError(err.message || 'Erro ao carregar NFTs');
+      setError('Unable to load biomes. Please check your connection and try again.');
       setLoaded(true);
     }
   }, [fetchMethod, signer]);

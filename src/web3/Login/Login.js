@@ -1,4 +1,4 @@
-import { IconButton } from '@mui/material';
+import { IconButton, Tooltip } from '@mui/material';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import Account from './components/Account';
 import { useWallet } from 'web3/WalletContext';
@@ -17,9 +17,11 @@ export const Login = () => {
           handleLogout={disconnect}
         />
       ) : (
-        <IconButton color="primary" onClick={connect} size="medium">
-          <AccountBalanceWalletIcon fontSize="large" />
-        </IconButton>
+        <Tooltip title="Connect Wallet">
+          <IconButton color="primary" onClick={connect} size="medium" aria-label="Connect Wallet">
+            <AccountBalanceWalletIcon fontSize="large" />
+          </IconButton>
+        </Tooltip>
       )}
     </div>
   );

@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Chip from '@mui/material/Chip';
 import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
+import CircularProgress from '@mui/material/CircularProgress';
 import { useTheme } from '@mui/material/styles';
 
 import Main from 'layouts/Main';
@@ -106,13 +108,23 @@ const AllNfts = () => {
         </Box>
 
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        {!loaded && !error && (
+          <Box display="flex" justifyContent="center" py={8}>
+            <CircularProgress />
+          </Box>
+        )}
         {loaded && filteredNfts.length > 0 && (
           <PortfolioGrid data={filteredNfts} buttonShow={true} onRefresh={reload} />
         )}
         {loaded && filteredNfts.length === 0 && !error && (
-          <Alert severity="info">
-            {search ? 'No biomes match your search.' : 'No biomes available at the moment.'}
-          </Alert>
+          <Box textAlign="center" py={4}>
+            <Alert severity="info" sx={{ mb: 2 }}>
+              {search ? 'No biomes match your search.' : 'No biomes available at the moment.'}
+            </Alert>
+            {!search && (
+              <Button variant="contained" href="/create">Create the First Biome</Button>
+            )}
+          </Box>
         )}
       </Container>
       <Box

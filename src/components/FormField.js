@@ -15,13 +15,13 @@ const FormField = ({
   <>
     <Typography
       variant="subtitle2"
-      sx={{ marginBottom: 2 }}
+      sx={{ marginBottom: 1 }}
       fontWeight={700}
     >
-      {label}
+      {label2 || label}
     </Typography>
     <TextField
-      label={label2 || label}
+      placeholder={label}
       variant="outlined"
       name={name}
       fullWidth

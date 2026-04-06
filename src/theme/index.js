@@ -33,12 +33,11 @@ const getTheme = (mode, themeToggler) =>
       components: {
         MuiCssBaseline: {
           styleOverrides: {
-            '*, *::before, *::after': {
-              transition: 'none',
-            },
-            '@media (prefers-reduced-motion: no-preference)': {
+            '@media (prefers-reduced-motion: reduce)': {
               '*, *::before, *::after': {
-                transition: undefined,
+                animationDuration: '0.01ms !important',
+                animationIterationCount: '1 !important',
+                transitionDuration: '0.01ms !important',
               },
             },
             ':focus-visible': {

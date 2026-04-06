@@ -4,6 +4,7 @@ import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
 
+import CircularProgress from '@mui/material/CircularProgress';
 import Main from 'layouts/Main';
 import Container from 'components/Container';
 import Contact from 'components/Contact';
@@ -63,7 +64,7 @@ export default function DevicesItem({ tokenId }) {
       });
     } catch (err) {
       console.error('Error loading NFT:', err);
-      setError(err.message || 'Erro ao carregar NFT');
+      setError('Unable to load device data. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -84,9 +85,9 @@ export default function DevicesItem({ tokenId }) {
     <Main>
       <Container paddingY={'0 !important'}>
         <Typography
-          variant={'h6'}
+          variant={'h4'}
           align={'left'}
-          sx={{ fontWeight: 700, marginBottom: 2 }}
+          sx={{ fontWeight: 700, marginBottom: 3 }}
         >
           Dashboard
         </Typography>
@@ -95,9 +96,24 @@ export default function DevicesItem({ tokenId }) {
             {error}
           </Alert>
         )}
-        <ItemCard nft={nft} />
-        <Box sx={{ height: 20 }} />
-        <Chart deviceUID={nft?.deviceUID} data={data || []} />
+        {loading && !nft && (
+          <Box display="flex" justifyContent="center" py={8}>
+            <CircularProgress />
+          </Box>
+        )}
+        {nft && (
+          <>
+            <ItemCard nft={nft} />
+            <Box sx={{ height: 20 }} />
+            {data.length > 0 ? (
+              <Chart deviceUID={nft?.deviceUID} data={data} />
+            ) : (
+              !loading && (
+                <Alert severity="info">No sensor data available for this device yet.</Alert>
+              )
+            )}
+          </>
+        )}
       </Container>
       <Box
         position={'relative'}

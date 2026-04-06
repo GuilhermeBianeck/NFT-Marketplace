@@ -72,7 +72,10 @@ const PortfolioGrid = ({ data = [], buttonShow, onRefresh, showSellerActions, sh
       setTxStatus('success');
       if (onRefresh) onRefresh();
     } catch (err) {
-      setTxError(err.reason || err.message || 'Transaction failed');
+      const msg = err.code === 'ACTION_REJECTED'
+        ? 'Transaction was rejected.'
+        : 'Something went wrong. Please try again.';
+      setTxError(msg);
       setTxStatus('error');
     } finally {
       setLoading(null);
@@ -186,28 +189,56 @@ const PortfolioGrid = ({ data = [], buttonShow, onRefresh, showSellerActions, sh
                 <Box display="flex" gap={0.5} alignItems="center">
                   {/* Buy */}
                   {buttonShow && !isSeller(item) && (
-                    <Button
-                      size="small"
-                      variant="contained"
-                      onClick={() => handleBuy(item)}
-                      disabled={!!loading}
-                      startIcon={loading === 'buy' ? <CircularProgress size={14} /> : <ShoppingBagIcon />}
-                    >
-                      {isMd ? 'Buy' : ''}
-                    </Button>
+                    isMd ? (
+                      <Button
+                        size="small"
+                        variant="contained"
+                        onClick={() => handleBuy(item)}
+                        disabled={!!loading}
+                        startIcon={loading === 'buy' ? <CircularProgress size={14} /> : <ShoppingBagIcon />}
+                      >
+                        Buy
+                      </Button>
+                    ) : (
+                      <Tooltip title="Buy">
+                        <IconButton
+                          size="small"
+                          color="primary"
+                          onClick={() => handleBuy(item)}
+                          disabled={!!loading}
+                          aria-label="Buy"
+                          sx={{ bgcolor: 'primary.main', color: 'primary.contrastText', '&:hover': { bgcolor: 'primary.dark' } }}
+                        >
+                          {loading === 'buy' ? <CircularProgress size={14} color="inherit" /> : <ShoppingBagIcon fontSize="small" />}
+                        </IconButton>
+                      </Tooltip>
+                    )
                   )}
 
                   {/* Resell */}
                   {showResell && isOwner(item) && item.sold && (
-                    <Button
-                      size="small"
-                      variant="contained"
-                      color="secondary"
-                      onClick={() => { setResellTarget(item); setResellPrice(''); setResellDialog(true); }}
-                      startIcon={<SellIcon />}
-                    >
-                      {isMd ? 'Resell' : ''}
-                    </Button>
+                    isMd ? (
+                      <Button
+                        size="small"
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => { setResellTarget(item); setResellPrice(''); setResellDialog(true); }}
+                        startIcon={<SellIcon />}
+                      >
+                        Resell
+                      </Button>
+                    ) : (
+                      <Tooltip title="Resell">
+                        <IconButton
+                          size="small"
+                          onClick={() => { setResellTarget(item); setResellPrice(''); setResellDialog(true); }}
+                          aria-label="Resell"
+                          sx={{ bgcolor: 'secondary.main', color: 'secondary.contrastText', '&:hover': { bgcolor: 'secondary.dark' } }}
+                        >
+                          <SellIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    )
                   )}
 
                   {/* Seller actions: overflow menu on mobile, buttons on desktop */}
