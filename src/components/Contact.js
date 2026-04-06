@@ -8,26 +8,21 @@ const Contact = () => {
   return (
     <Box>
       <Box marginBottom={4}>
-        <Typography
-          fontWeight={700}
-          variant={'h4'}
-          align={'center'}
-          gutterBottom
-        >
-          Se inscreva em nosso Newsletter
+        <Typography variant="h4" align="center" gutterBottom>
+          Subscribe to our Newsletter
         </Typography>
         <Typography
-          variant={'h6'}
-          component={'p'}
-          color={'text.secondary'}
-          align={'center'}
+          variant="h6"
+          component="p"
+          color="text.secondary"
+          align="center"
         >
-          Receba novidades e atualizações.
+          Get the latest news and updates.
         </Typography>
       </Box>
-      <Box maxWidth={600} margin={'0 auto'}>
+      <Box maxWidth={600} margin="0 auto">
         <Box
-          component={'form'}
+          component="form"
           noValidate
           autoComplete="off"
           sx={{
@@ -40,31 +35,24 @@ const Contact = () => {
             display="flex"
             flexDirection={{ xs: 'column', md: 'row' }}
             alignItems={{ xs: 'center', md: 'flex-start' }}
-            justifyContent={{ xs: 'center' }}
+            justifyContent="center"
+            gap={2}
           >
-            <Box
-              flex={'1 1 auto'}
-              component={TextField}
-              label="Digite seu email"
+            <TextField
+              label="Enter your email"
               variant="outlined"
               color="primary"
               fullWidth
-              height={54}
-              sx={{
-                maxWidth: 422,
-              }}
+              sx={{ maxWidth: 422 }}
             />
-            <Box
-              component={Button}
+            <Button
               variant="contained"
               color="primary"
               size="large"
-              height={54}
-              marginTop={{ xs: 2, md: 0 }}
-              marginLeft={{ md: 2 }}
+              sx={{ minHeight: 56 }}
             >
-              Inscrever
-            </Box>
+              Subscribe
+            </Button>
           </Box>
         </Box>
       </Box>

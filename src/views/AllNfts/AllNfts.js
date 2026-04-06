@@ -1,131 +1,126 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
+import Alert from '@mui/material/Alert';
+import Typography from '@mui/material/Typography';
+import Chip from '@mui/material/Chip';
+import TextField from '@mui/material/TextField';
+import MenuItem from '@mui/material/MenuItem';
+import InputAdornment from '@mui/material/InputAdornment';
+import SearchIcon from '@mui/icons-material/Search';
 import { useTheme } from '@mui/material/styles';
 
 import Main from 'layouts/Main';
 import Container from 'components/Container';
 import Contact from 'components/Contact';
 import PortfolioGrid from 'components/PortfolioGrid';
+import WaveDivider from 'components/WaveDivider';
+import useNFTLoader from 'hooks/useNFTLoader';
+import useMarketplace from 'hooks/useMarketplace';
 
-import axios from 'axios';
-import { ethers } from 'ethers';
-import Marketplace from 'contracts/Marketplace.sol/Marketplace.json';
+const SORT_OPTIONS = [
+  { value: 'newest', label: 'Newest' },
+  { value: 'price-low', label: 'Price: Low to High' },
+  { value: 'price-high', label: 'Price: High to Low' },
+];
 
 const AllNfts = () => {
   const theme = useTheme();
-  const [nfts, setNfts] = useState([]);
-  const [loaded, setLoaded] = useState(false);
+  const { nfts, loaded, error, reload } = useNFTLoader('fetchMarketItems');
+  const contract = useMarketplace();
+  const [stats, setStats] = useState({ listed: 0, minted: 0 });
+  const [search, setSearch] = useState('');
+  const [sort, setSort] = useState('newest');
 
   useEffect(() => {
-    loadNFTs();
-  }, []);
+    if (!contract) return;
+    async function loadStats() {
+      try {
+        const [listed, minted] = await Promise.all([
+          contract.totalItemsListed(),
+          contract.totalItemsMinted(),
+        ]);
+        setStats({ listed: listed.toNumber(), minted: minted.toNumber() });
+      } catch (err) {
+        console.error('Error loading stats:', err);
+      }
+    }
+    loadStats();
+  }, [contract]);
 
-  async function loadNFTs() {
-    const provider = new ethers.providers.JsonRpcProvider(
-      'https://rpc.cardona.zkevm-rpc.com',
-    );
-    const marketContract = new ethers.Contract(
-      process.env.MARKETPLACE_ADDRESS,
-      Marketplace.abi,
-      provider,
-    );
-    const data = await marketContract.fetchMarketItems();
+  const filteredNfts = nfts
+    .filter((nft) => {
+      if (!search) return true;
+      const q = search.toLowerCase();
+      return (
+        nft.name?.toLowerCase().includes(q) ||
+        nft.description?.toLowerCase().includes(q)
+      );
+    })
+    .sort((a, b) => {
+      if (sort === 'price-low') return parseFloat(a.price) - parseFloat(b.price);
+      if (sort === 'price-high') return parseFloat(b.price) - parseFloat(a.price);
+      return b.tokenId - a.tokenId;
+    });
 
-    const items = await Promise.all(
-      data.map(async (i) => {
-        const tokenUri = await marketContract.tokenURI(i.tokenId);
-        const meta = await axios.get(tokenUri);
-        let price = ethers.utils.formatUnits(i.price.toString(), 'ether');
-        let item = {
-          price,
-          tokenId: i.tokenId.toNumber(),
-          seller: i.seller,
-          owner: i.owner,
-          image: meta.data.image,
-          name: meta.data.name,
-          description: meta.data.description,
-          address: meta.data.address,
-        };
-        return item;
-      }),
-    );
-
-    setNfts(items);
-    setLoaded(true);
-  }
-
-  if (loaded && !nfts.length)
-    return (
-      <Main>
-        <Box
-          position={'relative'}
-          marginTop={{ xs: 4, md: 6 }}
-          sx={{
-            backgroundColor: theme.palette.alternate.main,
-          }}
-        >
-          <Box
-            component={'svg'}
-            preserveAspectRatio="none"
-            xmlns="http://www.w3.org/2000/svg"
-            x="0px"
-            y="0px"
-            viewBox="0 0 1920 100.1"
-            sx={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              transform: 'translateY(-50%)',
-              zIndex: 2,
-              width: 1,
-            }}
-          >
-            <path
-              fill={theme.palette.alternate.main}
-              d="M0,0c0,0,934.4,93.4,1920,0v100.1H0L0,0z"
-            ></path>
-          </Box>
-        </Box>
-        <Container>
-          <Contact />
-        </Container>
-      </Main>
-    );
   return (
     <Main>
       <Container>
-        <PortfolioGrid data={nfts} buttonShow={true} />
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3} flexWrap="wrap" gap={2}>
+          <Typography variant="h4">
+            All Biomes
+          </Typography>
+          <Box display="flex" gap={1}>
+            <Chip label={`${stats.listed} listed`} color="primary" variant="outlined" />
+            <Chip label={`${stats.minted} created`} color="secondary" variant="outlined" />
+          </Box>
+        </Box>
+
+        <Box display="flex" gap={2} mb={3} flexDirection={{ xs: 'column', sm: 'row' }}>
+          <TextField
+            placeholder="Search biomes..."
+            size="small"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            sx={{ flexGrow: 1, maxWidth: { sm: 400 } }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            select
+            size="small"
+            value={sort}
+            onChange={(e) => setSort(e.target.value)}
+            sx={{ minWidth: 180 }}
+          >
+            {SORT_OPTIONS.map((opt) => (
+              <MenuItem key={opt.value} value={opt.value}>
+                {opt.label}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Box>
+
+        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        {loaded && filteredNfts.length > 0 && (
+          <PortfolioGrid data={filteredNfts} buttonShow={true} onRefresh={reload} />
+        )}
+        {loaded && filteredNfts.length === 0 && !error && (
+          <Alert severity="info">
+            {search ? 'No biomes match your search.' : 'No biomes available at the moment.'}
+          </Alert>
+        )}
       </Container>
       <Box
-        position={'relative'}
+        position="relative"
         marginTop={{ xs: 4, md: 6 }}
-        sx={{
-          backgroundColor: theme.palette.alternate.main,
-        }}
+        sx={{ backgroundColor: theme.palette.alternate.main }}
       >
-        <Box
-          component={'svg'}
-          preserveAspectRatio="none"
-          xmlns="http://www.w3.org/2000/svg"
-          x="0px"
-          y="0px"
-          viewBox="0 0 1920 100.1"
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            transform: 'translateY(-50%)',
-            zIndex: 2,
-            width: 1,
-          }}
-        >
-          <path
-            fill={theme.palette.alternate.main}
-            d="M0,0c0,0,934.4,93.4,1920,0v100.1H0L0,0z"
-          ></path>
-        </Box>
+        <WaveDivider />
         <Container>
           <Contact />
         </Container>

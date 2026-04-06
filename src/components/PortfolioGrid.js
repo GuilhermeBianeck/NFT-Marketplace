@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
@@ -8,184 +9,298 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
 import CardMedia from '@mui/material/CardMedia';
 import LinkIcon from '@mui/icons-material/Link';
 import Link from '@mui/material/Link';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
+import CancelIcon from '@mui/icons-material/Cancel';
+import EditIcon from '@mui/icons-material/Edit';
+import SellIcon from '@mui/icons-material/Sell';
+import LockIcon from '@mui/icons-material/Lock';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import TextField from '@mui/material/TextField';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Chip from '@mui/material/Chip';
+import CircularProgress from '@mui/material/CircularProgress';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Tooltip from '@mui/material/Tooltip';
 
-import Web3Modal from 'web3modal';
 import { ethers } from 'ethers';
-import Marketplace from 'contracts/Marketplace.sol/Marketplace.json';
 import { useRouter } from 'next/router';
+import { useWallet } from 'web3/WalletContext';
+import useMarketplace from 'hooks/useMarketplace';
+import TransactionStatus from 'components/TransactionStatus';
 
-const PortfolioGrid = ({ data = [], buttonShow }) => {
+const PortfolioGrid = ({ data = [], buttonShow, onRefresh, showSellerActions, showResell }) => {
   const router = useRouter();
   const theme = useTheme();
+  const isMd = useMediaQuery(theme.breakpoints.up('md'));
+  const { address } = useWallet();
+  const contract = useMarketplace({ requireSigner: true });
 
-  async function buyNft(nft) {
-    /* needs the user to sign the transaction, so will use Web3Provider and sign it */
-    const web3Modal = new Web3Modal({
-      network: 'mainnet',
-      cacheProvider: true,
-    });
-    const connection = await web3Modal.connect();
-    const provider = new ethers.providers.Web3Provider(connection);
-    const signer = provider.getSigner();
-    const marketContract = new ethers.Contract(
-      process.env.MARKETPLACE_ADDRESS,
-      Marketplace.abi,
-      signer,
-    );
-    /* user will be prompted to pay the asking price to complete the transaction */
-    const price = ethers.utils.parseUnits(nft.price.toString(), 'ether');
+  const [txStatus, setTxStatus] = useState(null);
+  const [txHash, setTxHash] = useState('');
+  const [txError, setTxError] = useState('');
+  const [loading, setLoading] = useState(null);
+  const [menuAnchor, setMenuAnchor] = useState(null);
+  const [menuItem, setMenuItem] = useState(null);
 
-    const transaction = await marketContract.createMarketSale(nft.tokenId, {
-      value: price,
-    });
-    await transaction.wait();
-    await loadNFTs();
-  }
+  const [priceDialog, setPriceDialog] = useState(false);
+  const [priceTarget, setPriceTarget] = useState(null);
+  const [newPrice, setNewPrice] = useState('');
+
+  const [resellDialog, setResellDialog] = useState(false);
+  const [resellTarget, setResellTarget] = useState(null);
+  const [resellPrice, setResellPrice] = useState('');
+
+  const resetTx = () => { setTxStatus(null); setTxHash(''); setTxError(''); };
+
+  const execTx = useCallback(async (label, fn) => {
+    try {
+      setLoading(label);
+      setTxStatus('pending');
+      const tx = await fn();
+      await tx.wait();
+      setTxHash(tx.hash);
+      setTxStatus('success');
+      if (onRefresh) onRefresh();
+    } catch (err) {
+      setTxError(err.reason || err.message || 'Transaction failed');
+      setTxStatus('error');
+    } finally {
+      setLoading(null);
+    }
+  }, [onRefresh]);
+
+  const handleBuy = useCallback((item) => {
+    const price = ethers.utils.parseUnits(item.price.toString(), 'ether');
+    execTx('buy', () => contract.createMarketSale(item.tokenId, { value: price }));
+  }, [contract, execTx]);
+
+  const handleCancel = useCallback((item) => {
+    execTx('cancel', () => contract.cancelListing(item.tokenId));
+  }, [contract, execTx]);
+
+  const handleUpdatePrice = useCallback(() => {
+    if (!priceTarget || !newPrice) return;
+    const price = ethers.utils.parseUnits(newPrice, 'ether');
+    execTx('updatePrice', () => contract.updateItemPrice(priceTarget.tokenId, price));
+    setPriceDialog(false);
+  }, [contract, execTx, priceTarget, newPrice]);
+
+  const handleResell = useCallback(async () => {
+    if (!resellTarget || !resellPrice) return;
+    const price = ethers.utils.parseUnits(resellPrice, 'ether');
+    const listingPrice = await contract.getListingPrice();
+    execTx('resell', () => contract.resellToken(resellTarget.tokenId, price, { value: listingPrice }));
+    setResellDialog(false);
+  }, [contract, execTx, resellTarget, resellPrice]);
+
+  const handleFreeze = useCallback((item) => {
+    execTx('freeze', () => contract.freezeTokenURI(item.tokenId));
+  }, [contract, execTx]);
+
+  const isSeller = (item) => address && item.seller?.toLowerCase() === address.toLowerCase();
+  const isOwner = (item) => address && item.owner?.toLowerCase() === address.toLowerCase();
+
+  const openMenu = (event, item) => { setMenuAnchor(event.currentTarget); setMenuItem(item); };
+  const closeMenu = () => { setMenuAnchor(null); setMenuItem(null); };
 
   return (
     <Box>
+      <TransactionStatus status={txStatus} hash={txHash} error={txError} onClose={resetTx} />
       <Grid container spacing={4}>
-        {data.map((item, i) => (
-          <Grid item xs={12} sm={6} md={4} key={i}>
-            <Box display={'block'} width={1} height={1}>
-              <Box
-                key={i}
-                component={Card}
-                width={1}
-                height={1}
-                display={'flex'}
-                flexDirection={'column'}
+        {data.map((item) => (
+          <Grid item xs={12} sm={6} md={4} key={item.tokenId}>
+            <Card
+              sx={{
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: theme.shadows[4],
+                },
+              }}
+            >
+              <CardMedia
+                title={item.name}
+                image={item.image}
+                sx={{
+                  position: 'relative',
+                  paddingTop: '75%',
+                  overflow: 'hidden',
+                  backgroundColor: 'background.level2',
+                }}
               >
-                <CardMedia
-                  title={item.name}
-                  image={item.image}
-                  sx={{
-                    position: 'relative',
-                    height: { xs: 240, sm: 340, md: 280 },
-                    overflow: 'hidden',
-                  }}
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  position="absolute"
+                  bottom={0}
+                  padding={1.5}
+                  width={1}
                 >
-                  <Box
-                    display={'flex'}
-                    justifyContent={'space-between'}
-                    position={'absolute'}
-                    bottom={0}
-                    padding={2}
-                    width={1}
-                  >
-                    <Box
-                      padding={1}
-                      bgcolor={'background.paper'}
-                      boxShadow={1}
-                      borderRadius={2}
-                    >
-                      <Typography sx={{ fontWeight: 600 }}>
-                        {item.price} MATIC
-                      </Typography>
-                    </Box>
-                    <Box
-                      padding={1}
-                      bgcolor={'background.paper'}
-                      boxShadow={1}
-                      borderRadius={2}
-                    >
-                      <Box
-                        component={'svg'}
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        width={16}
-                        height={16}
-                        color={'primary.main'}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                        />
-                      </Box>
-                    </Box>
+                  <Chip
+                    label={`${item.price} POL`}
+                    size="small"
+                    sx={{
+                      bgcolor: 'background.paper',
+                      fontWeight: 700,
+                      boxShadow: 1,
+                    }}
+                  />
+                  {item.frozen && (
+                    <Chip icon={<LockIcon />} label="Frozen" size="small" color="info" />
+                  )}
+                </Box>
+              </CardMedia>
+              <CardContent sx={{ flexGrow: 1, pb: 1 }}>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  {item.name}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1, mb: 1 }}>
+                  {item.description}
+                </Typography>
+                {item.address && (
+                  <Box display="flex" alignItems="center" gap={0.5}>
+                    <LinkIcon sx={{ width: 14, height: 14 }} />
+                    <Link href={item.address} underline="hover" variant="caption" color="text.secondary">
+                      View link
+                    </Link>
                   </Box>
-                </CardMedia>
-                <CardContent>
-                  <Typography
-                    variant={'h6'}
-                    align={'left'}
-                    sx={{ fontWeight: 700 }}
-                  >
-                    {item.name}
-                  </Typography>
-                  <Box display={'flex'} alignItems={'center'} marginY={2}>
-                    <Typography variant={'subtitle2'} color="text.secondary">
-                      {item.description}
-                    </Typography>
-                  </Box>
-                  <Box display={'flex'} alignItems={'center'}>
-                    <Box
-                      component={'svg'}
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      width={16}
-                      height={16}
-                      marginRight={1}
-                    >
-                      <LinkIcon />
-                    </Box>
-                    <Typography variant={'subtitle2'} color="text.secondary">
-                      <Link href={item.address} underline="none">
-                        Link to NFT
-                      </Link>
-                    </Typography>
-                  </Box>
-                  <CardActions sx={{ justifyContent: 'flex-end' }}>
+                )}
+              </CardContent>
+              <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
+                <Button size="small" onClick={() => router.push(`/devices/${item.tokenId}`)}>
+                  Details
+                </Button>
+                <Box display="flex" gap={0.5} alignItems="center">
+                  {/* Buy */}
+                  {buttonShow && !isSeller(item) && (
                     <Button
-                      // href={`/devices/${item.tokenId}`}
-                      onClick={() => router.push(`/devices/${item.tokenId}`)}
+                      size="small"
+                      variant="contained"
+                      onClick={() => handleBuy(item)}
+                      disabled={!!loading}
+                      startIcon={loading === 'buy' ? <CircularProgress size={14} /> : <ShoppingBagIcon />}
                     >
-                      Devices
+                      {isMd ? 'Buy' : ''}
                     </Button>
-                    {buttonShow && (
-                      <Button
-                        onClick={() => buyNft(item)}
-                        startIcon={
-                          <Box
-                            component={'svg'}
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            width={24}
-                            height={24}
-                          >
-                            <ShoppingBagIcon />
-                          </Box>
-                        }
-                      >
-                        Comprar
-                      </Button>
-                    )}
-                  </CardActions>
-                </CardContent>
-              </Box>
-            </Box>
+                  )}
+
+                  {/* Resell */}
+                  {showResell && isOwner(item) && item.sold && (
+                    <Button
+                      size="small"
+                      variant="contained"
+                      color="secondary"
+                      onClick={() => { setResellTarget(item); setResellPrice(''); setResellDialog(true); }}
+                      startIcon={<SellIcon />}
+                    >
+                      {isMd ? 'Resell' : ''}
+                    </Button>
+                  )}
+
+                  {/* Seller actions: overflow menu on mobile, buttons on desktop */}
+                  {showSellerActions && isSeller(item) && (
+                    isMd ? (
+                      <>
+                        <Tooltip title="Cancel listing">
+                          <IconButton size="small" color="error" onClick={() => handleCancel(item)} disabled={!!loading}>
+                            <CancelIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Update price">
+                          <IconButton size="small" onClick={() => { setPriceTarget(item); setNewPrice(item.price); setPriceDialog(true); }}>
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        {!item.frozen && (
+                          <Tooltip title="Freeze metadata">
+                            <IconButton size="small" onClick={() => handleFreeze(item)} disabled={!!loading}>
+                              <LockIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <IconButton size="small" onClick={(e) => openMenu(e, item)}>
+                          <MoreVertIcon fontSize="small" />
+                        </IconButton>
+                      </>
+                    )
+                  )}
+                </Box>
+              </CardActions>
+            </Card>
           </Grid>
         ))}
       </Grid>
+
+      {/* Mobile overflow menu */}
+      <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={closeMenu}>
+        <MenuItem onClick={() => { handleCancel(menuItem); closeMenu(); }}>
+          <ListItemIcon><CancelIcon fontSize="small" color="error" /></ListItemIcon>
+          <ListItemText>Cancel Listing</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={() => { setPriceTarget(menuItem); setNewPrice(menuItem?.price); setPriceDialog(true); closeMenu(); }}>
+          <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>Update Price</ListItemText>
+        </MenuItem>
+        {menuItem && !menuItem.frozen && (
+          <MenuItem onClick={() => { handleFreeze(menuItem); closeMenu(); }}>
+            <ListItemIcon><LockIcon fontSize="small" /></ListItemIcon>
+            <ListItemText>Freeze Metadata</ListItemText>
+          </MenuItem>
+        )}
+      </Menu>
+
+      {/* Update Price Dialog */}
+      <Dialog open={priceDialog} onClose={() => setPriceDialog(false)} aria-labelledby="price-dialog-title">
+        <DialogTitle id="price-dialog-title">Update Price</DialogTitle>
+        <DialogContent>
+          <TextField label="New price (POL)" fullWidth value={newPrice} onChange={(e) => setNewPrice(e.target.value)} sx={{ mt: 1 }} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setPriceDialog(false)}>Cancel</Button>
+          <Button variant="contained" onClick={handleUpdatePrice}>Update</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Resell Dialog */}
+      <Dialog open={resellDialog} onClose={() => setResellDialog(false)} aria-labelledby="resell-dialog-title">
+        <DialogTitle id="resell-dialog-title">Resell NFT</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            A listing fee will be charged.
+          </Typography>
+          <TextField label="Sale price (POL)" fullWidth value={resellPrice} onChange={(e) => setResellPrice(e.target.value)} sx={{ mt: 1 }} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setResellDialog(false)}>Cancel</Button>
+          <Button variant="contained" onClick={handleResell}>List for Sale</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
 
 PortfolioGrid.propTypes = {
-  data: PropTypes.array,
+  data: PropTypes.arrayOf(PropTypes.object),
   buttonShow: PropTypes.bool,
+  onRefresh: PropTypes.func,
+  showSellerActions: PropTypes.bool,
+  showResell: PropTypes.bool,
 };
 
 export default PortfolioGrid;

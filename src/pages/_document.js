@@ -1,4 +1,3 @@
-/* eslint-disable react/display-name */
 import React from 'react';
 import Document, { Html, Head, Main, NextScript } from 'next/document';
 import createCache from '@emotion/cache';
@@ -17,7 +16,7 @@ export default class MyDocument extends Document {
           <meta name="theme-color" content="#ffffff" />
           <meta
             name="description"
-            content="Plataforma para Preservação de Biomas e NFTs."
+            content="Platform for Biome Preservation and NFTs."
           />
           <meta
             name="robots"
@@ -29,21 +28,19 @@ export default class MyDocument extends Document {
             property="og:image"
             content="https://raw.githubusercontent.com/GuilhermeBianeck/NFT-Marketplace/refs/heads/main/images/biomacloud.svg"
           />
-          <meta
-            property="og:title"
-            content="Mercado de NFT"
-          />
+          <meta property="og:title" content="Bioma - NFT Marketplace" />
           <meta
             property="og:description"
-            content="Plataforma para Preservação de Biomas e NFTs."
+            content="Platform for Biome Preservation and NFTs."
           />
-          <meta
-            property="og:url"
-            content="www.google.com"
-          />
-          <link rel="preconnect" href="https://fonts.gstatic.com" />
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link
-            href="https://raw.githubusercontent.com/GuilhermeBianeck/NFT-Marketplace/refs/heads/main/images/biomacloud.svg"
+            rel="preconnect"
+            href="https://fonts.gstatic.com"
+            crossOrigin="anonymous"
+          />
+          <link
+            href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
             rel="stylesheet"
           />
         </Head>
@@ -76,7 +73,6 @@ MyDocument.getInitialProps = async (ctx) => {
     <style
       data-emotion={`${style.key} ${style.ids.join(' ')}`}
       key={style.key}
-      // eslint-disable-next-line react/no-danger
       dangerouslySetInnerHTML={{ __html: style.css }}
     />
   ));

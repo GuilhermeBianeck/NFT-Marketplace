@@ -12,7 +12,7 @@ export function getChainData(chainId) {
     throw new Error('ChainId missing or not supported')
   }
 
-  const API_KEY = 'a1f754ea74b24beea097773f476894e0';
+  const API_KEY = process.env.INFURA_API || '';
 
   if (
     chainData.rpc_url.includes('infura.io') &&

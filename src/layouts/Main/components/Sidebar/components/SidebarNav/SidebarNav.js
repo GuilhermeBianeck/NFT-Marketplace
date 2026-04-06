@@ -1,14 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
-import { useTheme } from '@mui/material/styles';
 import NavItem from './components/NavItem';
 import Login from 'web3/Login';
+import { LOGO_URL } from 'constants';
 
 const SidebarNav = ({ pages }) => {
-  const theme = useTheme();
-  const { mode } = theme.palette;
-
   return (
     <Box>
       <Box width={1} paddingX={2} paddingY={1}>
@@ -21,11 +18,8 @@ const SidebarNav = ({ pages }) => {
         >
           <Box
             component={'img'}
-            src={
-              mode === 'light'
-                ? 'https://raw.githubusercontent.com/GuilhermeBianeck/NFT-Marketplace/refs/heads/main/images/IoTTree.svg'
-                : 'https://raw.githubusercontent.com/GuilhermeBianeck/NFT-Marketplace/refs/heads/main/images/IoTTree.svg'
-            }
+            src={LOGO_URL}
+            alt="Bioma - Logo"
             height={1}
             width={1}
           />
