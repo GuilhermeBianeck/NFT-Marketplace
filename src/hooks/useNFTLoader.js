@@ -36,7 +36,9 @@ export default function useNFTLoader(fetchMethod = 'fetchMarketItems', options =
         );
       }
 
-      const data = await marketContract[fetchMethod]();
+      // Use explicit signature for overloaded functions (ethers v5)
+      const fn = marketContract[fetchMethod] || marketContract[`${fetchMethod}()`];
+      const data = await fn();
 
       const items = await Promise.all(
         data.map(async (i) => {
