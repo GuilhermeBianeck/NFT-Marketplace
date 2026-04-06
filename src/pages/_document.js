@@ -11,7 +11,7 @@ export default class MyDocument extends Document {
           <meta charSet="utf-8" />
           <link
             rel="shortcut icon"
-            href="https://raw.githubusercontent.com/GuilhermeBianeck/NFT-Marketplace/refs/heads/main/images/IoTTree.svg"
+            href="/IoTTree.svg"
           />
           <meta name="theme-color" content="#ffffff" />
           <meta
@@ -26,7 +26,7 @@ export default class MyDocument extends Document {
           <meta property="og:type" content="website" />
           <meta
             property="og:image"
-            content="https://raw.githubusercontent.com/GuilhermeBianeck/NFT-Marketplace/refs/heads/main/images/biomacloud.svg"
+            content="/biomacloud.svg"
           />
           <meta property="og:title" content="Bioma - NFT Marketplace" />
           <meta

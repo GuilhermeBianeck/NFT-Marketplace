@@ -4,7 +4,6 @@ import { ThemeProvider } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import CssBaseline from '@mui/material/CssBaseline';
 import getTheme from 'theme';
-import AOS from 'aos';
 
 export const useDarkMode = () => {
   const [themeMode, setTheme] = useState('light');
@@ -43,19 +42,23 @@ export default function Page({ children }) {
       jssStyles.parentElement.removeChild(jssStyles);
     }
 
-    AOS.init({
-      once: true,
-      delay: 0,
-      duration: 800,
-      offset: 0,
-      easing: 'ease-in-out',
+    import('aos').then((AOS) => {
+      AOS.init({
+        once: true,
+        delay: 0,
+        duration: 800,
+        offset: 0,
+        easing: 'ease-in-out',
+      });
     });
   }, []);
 
   const [themeMode, themeToggler, mountedComponent] = useDarkMode();
 
   useEffect(() => {
-    AOS.refresh();
+    import('aos').then((AOS) => {
+      AOS.refresh();
+    });
   }, [mountedComponent, themeMode]);
 
   return (
