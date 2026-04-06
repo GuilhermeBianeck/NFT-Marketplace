@@ -16,7 +16,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import DialogBox from 'components/DialogBox';
 import FormField from 'components/FormField';
 
-import web3 from 'web3';
 import { ethers } from 'ethers';
 import { create } from 'ipfs-http-client';
 import Marketplace from 'contracts/Marketplace.sol/Marketplace.json';
@@ -78,19 +77,19 @@ const Form = () => {
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef(null);
 
-  const projectId = process.env.INFURA_IPFS_ID;
-  const projectSecret = process.env.INFURA_IPFS_SECRET;
-  const infuraDomain = process.env.INFURA_IPFS_DOMAIN;
+  const projectId = process.env.INFURA_IPFS_ID || '';
+  const projectSecret = process.env.INFURA_IPFS_SECRET || '';
+  const infuraDomain = process.env.INFURA_IPFS_DOMAIN || '';
 
-  const auth =
-    'Basic ' + Buffer.from(projectId + ':' + projectSecret).toString('base64');
-
-  const client = create({
-    host: 'ipfs.infura.io',
-    port: 5001,
-    protocol: 'https',
-    headers: { authorization: auth },
-  });
+  const getClient = () => {
+    const auth = 'Basic ' + btoa(projectId + ':' + projectSecret);
+    return create({
+      host: 'ipfs.infura.io',
+      port: 5001,
+      protocol: 'https',
+      headers: { authorization: auth },
+    });
+  };
 
   async function createSale(url) {
     if (!fileUrl) { setAlertOpen(true); return; }
@@ -101,7 +100,7 @@ const Form = () => {
       const signer = provider.getSigner();
       const signerAddress = await signer.getAddress();
 
-      const price = web3.utils.toWei(formik.values.price, 'ether');
+      const price = ethers.utils.parseEther(formik.values.price);
       const contract = new ethers.Contract(MARKETPLACE_ADDRESS, Marketplace.abi, signer);
       const listingPrice = (await contract.getListingPrice()).toString();
       const royaltyFee = 500;
@@ -123,7 +122,7 @@ const Form = () => {
   async function processFile(file) {
     if (!file) return;
     try {
-      const added = await client.add(file);
+      const added = await getClient().add(file);
       const url = `${infuraDomain}/ipfs/${added.path}`;
       setFileUrl(url);
       setOpen(true);
@@ -139,7 +138,7 @@ const Form = () => {
     if (!name || !description || !price || !fileUrl) return;
     try {
       const data = JSON.stringify({ name, description, address, image: fileUrl, deviceUID, sensorType });
-      const added = await client.add(data);
+      const added = await getClient().add(data);
       const url = `${infuraDomain}/ipfs/${added.path}`;
       await createSale(url);
     } catch (error) {
