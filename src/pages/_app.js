@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Head from 'next/head';
-import dynamic from 'next/dynamic';
 import Page from '../components/Page';
 import ErrorBoundary from '../components/ErrorBoundary';
 
@@ -11,9 +10,18 @@ import 'slick-carousel/slick/slick-theme.css';
 import 'react-image-lightbox/style.css';
 import 'aos/dist/aos.css';
 
-const Web3Providers = dynamic(() => import('../web3/Web3Providers'), {
-  ssr: false,
-});
+function Web3ProviderWrapper({ children }) {
+  const [Provider, setProvider] = useState(null);
+
+  useEffect(() => {
+    import('../web3/Web3Providers').then((mod) => {
+      setProvider(() => mod.default);
+    });
+  }, []);
+
+  if (!Provider) return <>{children}</>;
+  return <Provider>{children}</Provider>;
+}
 
 export default function App({ Component, pageProps }) {
   return (
@@ -25,13 +33,13 @@ export default function App({ Component, pageProps }) {
         />
         <title>Bioma</title>
       </Head>
-      <Web3Providers>
+      <Web3ProviderWrapper>
         <Page>
           <ErrorBoundary>
             <Component {...pageProps} />
           </ErrorBoundary>
         </Page>
-      </Web3Providers>
+      </Web3ProviderWrapper>
     </React.Fragment>
   );
 }
