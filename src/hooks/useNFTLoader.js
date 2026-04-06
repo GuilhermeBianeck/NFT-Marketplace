@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { ethers } from 'ethers';
 import Marketplace from 'contracts/Marketplace.sol/Marketplace.json';
-import { RPC_URL, MARKETPLACE_ADDRESS } from 'constants';
+import { RPC_URL, MARKETPLACE_ADDRESS } from 'config';
 
 export default function useNFTLoader(fetchMethod = 'fetchMarketItems', options = {}) {
   const { signer, autoLoad = true } = options;

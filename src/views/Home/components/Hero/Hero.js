@@ -4,7 +4,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
-import { HERO_IMAGE_URL } from 'constants';
+import { HERO_IMAGE_URL } from 'config';
 
 const Hero = () => {
   const theme = useTheme();

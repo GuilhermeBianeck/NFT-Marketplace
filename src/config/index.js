@@ -1,7 +1,7 @@
 export const RPC_URL =
   process.env.POLYGON_RPC_URL || 'https://polygon-rpc.com';
 
-export const MARKETPLACE_ADDRESS = process.env.MARKETPLACE_ADDRESS;
+export const MARKETPLACE_ADDRESS = (process.env.MARKETPLACE_ADDRESS || '').trim();
 
 export const POLLING_INTERVAL = 5000;
 
