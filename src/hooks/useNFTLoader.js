@@ -11,7 +11,8 @@ export default function useNFTLoader(fetchMethod = 'fetchMarketItems', options =
   const [error, setError] = useState(null);
 
   const loadNFTs = useCallback(async () => {
-    if (!MARKETPLACE_ADDRESS || typeof window === 'undefined') {
+    const address = MARKETPLACE_ADDRESS?.trim();
+    if (!address || typeof window === 'undefined') {
       setLoaded(true);
       return;
     }
@@ -22,14 +23,14 @@ export default function useNFTLoader(fetchMethod = 'fetchMarketItems', options =
 
       if (signer) {
         marketContract = new ethers.Contract(
-          MARKETPLACE_ADDRESS,
+          address,
           Marketplace.abi,
           signer,
         );
       } else {
         provider = new ethers.providers.JsonRpcProvider(RPC_URL);
         marketContract = new ethers.Contract(
-          MARKETPLACE_ADDRESS,
+          address,
           Marketplace.abi,
           provider,
         );
