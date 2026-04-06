@@ -17,7 +17,6 @@ import DialogBox from 'components/DialogBox';
 import FormField from 'components/FormField';
 
 import { ethers } from 'ethers';
-import { create } from 'ipfs-http-client';
 import { useWallet } from 'web3/WalletContext';
 import useMarketplace from 'hooks/useMarketplace';
 
@@ -76,19 +75,32 @@ const Form = () => {
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef(null);
 
-  const projectId = process.env.INFURA_IPFS_ID || '';
-  const projectSecret = process.env.INFURA_IPFS_SECRET || '';
-  const infuraDomain = process.env.INFURA_IPFS_DOMAIN || '';
+  const pinataJwt = process.env.NEXT_PUBLIC_PINATA_JWT || '';
+  const pinataGateway = process.env.NEXT_PUBLIC_PINATA_GATEWAY || 'https://gateway.pinata.cloud';
 
-  const getClient = () => {
-    const auth = 'Basic ' + btoa(projectId + ':' + projectSecret);
-    return create({
-      host: 'ipfs.infura.io',
-      port: 5001,
-      protocol: 'https',
-      headers: { authorization: auth },
+  async function uploadToPinata(fileOrData, isJson = false) {
+    const formData = new FormData();
+    if (isJson) {
+      const blob = new Blob([fileOrData], { type: 'application/json' });
+      formData.append('file', blob, 'metadata.json');
+    } else {
+      formData.append('file', fileOrData);
+    }
+
+    const res = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${pinataJwt}` },
+      body: formData,
     });
-  };
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.details || 'Pinata upload failed');
+    }
+
+    const data = await res.json();
+    return `${pinataGateway}/ipfs/${data.IpfsHash}`;
+  }
 
   async function createSale(url) {
     if (!fileUrl) { setAlertOpen(true); return; }
@@ -115,8 +127,7 @@ const Form = () => {
   async function processFile(file) {
     if (!file) return;
     try {
-      const added = await getClient().add(file);
-      const url = `${infuraDomain}/ipfs/${added.path}`;
+      const url = await uploadToPinata(file);
       setFileUrl(url);
       setOpen(true);
     } catch (error) {
@@ -130,9 +141,8 @@ const Form = () => {
     const { name, description, price, address, deviceUID, sensorType } = formik.values;
     if (!name || !description || !price || !fileUrl) return;
     try {
-      const data = JSON.stringify({ name, description, address, image: fileUrl, deviceUID, sensorType });
-      const added = await getClient().add(data);
-      const url = `${infuraDomain}/ipfs/${added.path}`;
+      const metadata = JSON.stringify({ name, description, address, image: fileUrl, deviceUID, sensorType });
+      const url = await uploadToPinata(metadata, true);
       await createSale(url);
     } catch (error) {
       console.error('Error uploading metadata:', error);
