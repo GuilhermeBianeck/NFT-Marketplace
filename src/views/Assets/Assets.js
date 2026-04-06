@@ -16,10 +16,10 @@ import { useWallet } from 'web3/WalletContext';
 
 const Assets = () => {
   const theme = useTheme();
-  const { web3Provider } = useWallet();
+  const { isConnected, signer } = useWallet();
   const { nfts, loaded, error, reload } = useNFTLoader('fetchMyNFTs', {
-    signer: web3Provider ? web3Provider.getSigner() : null,
-    autoLoad: !!web3Provider,
+    signer: signer || null,
+    autoLoad: isConnected,
   });
 
   return (
@@ -33,7 +33,7 @@ const Assets = () => {
           }
         />
       </Container>
-      {!web3Provider && (
+      {!isConnected && (
         <Container paddingY={'0 !important'}>
           <Alert severity="info">Connect your wallet to view your assets.</Alert>
         </Container>
@@ -43,7 +43,7 @@ const Assets = () => {
           <Alert severity="error">{error}</Alert>
         </Container>
       )}
-      {web3Provider && !loaded && !error && (
+      {isConnected && !loaded && !error && (
         <Container paddingY={'0 !important'}>
           <Box display="flex" justifyContent="center" py={8}>
             <CircularProgress />
@@ -55,7 +55,7 @@ const Assets = () => {
           <PortfolioGrid data={nfts} showResell={true} onRefresh={reload} />
         </Container>
       )}
-      {loaded && nfts.length === 0 && web3Provider && !error && (
+      {loaded && nfts.length === 0 && isConnected && !error && (
         <Container paddingY={'0 !important'}>
           <Box textAlign="center" py={4}>
             <Box display="flex" gap={2} justifyContent="center" mt={2}>

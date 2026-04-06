@@ -18,10 +18,8 @@ import FormField from 'components/FormField';
 
 import { ethers } from 'ethers';
 import { create } from 'ipfs-http-client';
-import Marketplace from 'contracts/Marketplace.sol/Marketplace.json';
-import { MARKETPLACE_ADDRESS } from 'config';
 import { useWallet } from 'web3/WalletContext';
-import Web3Modal from 'web3modal';
+import useMarketplace from 'hooks/useMarketplace';
 
 const validationSchema = yup.object({
   name: yup
@@ -50,7 +48,8 @@ const validationSchema = yup.object({
 });
 
 const Form = () => {
-  const { web3Provider } = useWallet();
+  const { address, isConnected } = useWallet();
+  const writeContract = useMarketplace({ requireSigner: true });
 
   const formik = useFormik({
     initialValues: {
@@ -93,18 +92,12 @@ const Form = () => {
 
   async function createSale(url) {
     if (!fileUrl) { setAlertOpen(true); return; }
+    if (!writeContract || !address) { return; }
     try {
-      const web3Modal = new Web3Modal({ network: 'matic', cacheProvider: true });
-      const connection = await web3Modal.connect();
-      const provider = new ethers.providers.Web3Provider(connection);
-      const signer = provider.getSigner();
-      const signerAddress = await signer.getAddress();
-
       const price = ethers.utils.parseEther(formik.values.price);
-      const contract = new ethers.Contract(MARKETPLACE_ADDRESS, Marketplace.abi, signer);
-      const listingPrice = (await contract.getListingPrice()).toString();
+      const listingPrice = (await writeContract.getListingPrice()).toString();
       const royaltyFee = 500;
-      const transaction = await contract.createToken(url, price, signerAddress, royaltyFee, { value: listingPrice });
+      const transaction = await writeContract.createToken(url, price, address, royaltyFee, { value: listingPrice });
 
       await transaction.wait();
       setHash(transaction.hash);
