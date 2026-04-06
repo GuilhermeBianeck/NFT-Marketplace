@@ -62,6 +62,7 @@ const Form = () => {
     validationSchema,
     onSubmit: () => {
       setLoading(true);
+      setFormError('');
       createMarket();
     },
   });
@@ -73,6 +74,7 @@ const Form = () => {
   const [dialogBoxOpen, setDialogBoxOpen] = useState(false);
   const [hash, setHash] = useState('');
   const [dragActive, setDragActive] = useState(false);
+  const [formError, setFormError] = useState('');
   const fileInputRef = useRef(null);
 
   const pinataJwt = process.env.NEXT_PUBLIC_PINATA_JWT || '';
@@ -95,7 +97,7 @@ const Form = () => {
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error(err.error?.details || 'Pinata upload failed');
+      throw new Error(err.error?.details || err.error || 'Upload failed');
     }
 
     const data = await res.json();
@@ -103,8 +105,16 @@ const Form = () => {
   }
 
   async function createSale(url) {
-    if (!fileUrl) { setAlertOpen(true); return; }
-    if (!writeContract || !address) { return; }
+    if (!fileUrl) {
+      setAlertOpen(true);
+      setLoading(false);
+      return;
+    }
+    if (!writeContract || !address) {
+      setFormError('Please connect your wallet first.');
+      setLoading(false);
+      return;
+    }
     try {
       const price = ethers.utils.parseEther(formik.values.price);
       const listingPrice = (await writeContract.getListingPrice()).toString();
@@ -116,10 +126,17 @@ const Form = () => {
       setDialogBoxOpen(true);
     } catch (error) {
       console.error('Error creating NFT:', error);
+      if (error.code === 'ACTION_REJECTED') {
+        setFormError('Transaction was rejected.');
+      } else {
+        setFormError('Failed to create NFT. Please try again.');
+      }
     } finally {
       if (fileInputRef.current) fileInputRef.current.value = '';
       setAlertOpen(false);
       formik.resetForm();
+      setFileUrl('');
+      setOpen(false);
       setLoading(false);
     }
   }
@@ -127,25 +144,43 @@ const Form = () => {
   async function processFile(file) {
     if (!file) return;
     try {
+      setFormError('');
       const url = await uploadToPinata(file);
       setFileUrl(url);
       setOpen(true);
     } catch (error) {
       console.error('Error uploading file:', error);
+      setFormError('File upload failed: ' + error.message);
       setLoading(false);
       setOpen(false);
     }
   }
 
   async function createMarket() {
-    const { name, description, price, address, deviceUID, sensorType } = formik.values;
-    if (!name || !description || !price || !fileUrl) return;
+    const { name, description, price, address: link, deviceUID, sensorType } = formik.values;
+    if (!name || !description || !price) {
+      setFormError('Please fill in all required fields.');
+      setLoading(false);
+      return;
+    }
+    if (!fileUrl) {
+      setFormError('Please upload a file first.');
+      setAlertOpen(true);
+      setLoading(false);
+      return;
+    }
+    if (!isConnected) {
+      setFormError('Please connect your wallet first.');
+      setLoading(false);
+      return;
+    }
     try {
-      const metadata = JSON.stringify({ name, description, address, image: fileUrl, deviceUID, sensorType });
+      const metadata = JSON.stringify({ name, description, address: link, image: fileUrl, deviceUID, sensorType });
       const url = await uploadToPinata(metadata, true);
       await createSale(url);
     } catch (error) {
       console.error('Error uploading metadata:', error);
+      setFormError('Failed to upload metadata: ' + error.message);
       setLoading(false);
     }
   }
@@ -161,10 +196,20 @@ const Form = () => {
 
   return (
     <Box>
+      {!isConnected && (
+        <Alert severity="warning" sx={{ mb: 3 }}>
+          Connect your wallet to create a Biome NFT.
+        </Alert>
+      )}
+      {formError && (
+        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setFormError('')}>
+          {formError}
+        </Alert>
+      )}
       <form onSubmit={formik.handleSubmit}>
         <Grid container spacing={4}>
           <Grid item xs={12} sm={6}>
-            <Typography variant="subtitle2" sx={{ mb: 2 }} fontWeight={700}>
+            <Typography variant="subtitle2" sx={{ mb: 1 }} fontWeight={700}>
               Upload File *
             </Typography>
             <Box
@@ -226,7 +271,7 @@ const Form = () => {
             <FormField label="Price" name="price" formik={formik} label2="Biome Price (POL) *" />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <FormField label="Link" name="address" formik={formik} label2="Link to NFT" />
+            <FormField label="Link" name="address" formik={formik} label2="Link to NFT (optional)" />
           </Grid>
           <Grid item xs={12} sm={6}>
             <FormField label="Device UID" name="deviceUID" formik={formik} label2="Device UID *" />
@@ -236,7 +281,15 @@ const Form = () => {
           </Grid>
           <Grid item container xs={12}>
             <Box display="flex" flexDirection={{ xs: 'column', sm: 'row' }} alignItems={{ xs: 'stretched', sm: 'center' }} justifyContent="space-between" width={1} margin="0 auto">
-              <LoadingButton endIcon={<SendIcon />} size="large" variant="contained" type="submit" loading={loading} loadingPosition="end">
+              <LoadingButton
+                endIcon={<SendIcon />}
+                size="large"
+                variant="contained"
+                type="submit"
+                loading={loading}
+                loadingPosition="end"
+                disabled={!isConnected}
+              >
                 Create
               </LoadingButton>
             </Box>
