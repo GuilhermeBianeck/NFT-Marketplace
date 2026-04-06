@@ -6,12 +6,10 @@ import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import AppBar from '@mui/material/AppBar';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
+import { alpha } from '@mui/material/styles';
 
 import Container from 'components/Container';
-//import TopNav from 'components/TopNav';
-
 import { Topbar, Sidebar, Footer } from './components';
-
 import pages from '../navigation';
 
 const Main = ({ children, colorInvert = false, bgcolor = 'transparent' }) => {
@@ -22,13 +20,8 @@ const Main = ({ children, colorInvert = false, bgcolor = 'transparent' }) => {
 
   const [openSidebar, setOpenSidebar] = useState(false);
 
-  const handleSidebarOpen = () => {
-    setOpenSidebar(true);
-  };
-
-  const handleSidebarClose = () => {
-    setOpenSidebar(false);
-  };
+  const handleSidebarOpen = () => setOpenSidebar(true);
+  const handleSidebarClose = () => setOpenSidebar(false);
 
   const open = isMd ? false : openSidebar;
 
@@ -43,7 +36,11 @@ const Main = ({ children, colorInvert = false, bgcolor = 'transparent' }) => {
         position={'sticky'}
         sx={{
           top: 0,
-          backgroundColor: trigger ? theme.palette.background.paper : bgcolor,
+          backgroundColor: trigger
+            ? alpha(theme.palette.background.paper, 0.9)
+            : bgcolor,
+          backdropFilter: trigger ? 'blur(8px)' : 'none',
+          transition: 'all 0.3s ease',
         }}
         elevation={trigger ? 1 : 0}
       >

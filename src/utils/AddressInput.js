@@ -5,6 +5,28 @@ import Blockie from './Blockie';
 import Input from '@mui/material/Input';
 import SearchIcon from '@mui/icons-material/Search';
 
+const CrossIcon = ({ onClick }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="22"
+    height="22"
+    viewBox="0 0 24 24"
+    strokeWidth="2"
+    stroke="#E33132"
+    fill="none"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    onClick={onClick}
+    style={{ cursor: 'pointer' }}
+    role="button"
+    aria-label="Limpar"
+  >
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <line x1="18" y1="6" x2="6" y2="18" />
+    <line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+);
+
 function AddressInput(props) {
   const input = useRef(null);
   const { web3 } = useMoralis();
@@ -54,31 +76,11 @@ function AddressInput(props) {
     [resolveDomain, web3?.eth?.ens],
   );
 
-  const Cross = () => (
-    <svg
-      xmlns='http://www.w3.org/2000/svg'
-      width='22'
-      height='22'
-      viewBox='0 0 24 24'
-      strokeWidth='2'
-      stroke='#E33132'
-      fill='none'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      onClick={() => {
-        setValidatedAddress('');
-        setIsDomain(false);
-        setTimeout(function () {
-          input.current.focus();
-        });
-      }}
-      style={{ cursor: 'pointer' }}
-    >
-      <path stroke='none' d='M0 0h24v24H0z' fill='none' />
-      <line x1='18' y1='6' x2='6' y2='18' />
-      <line x1='6' y1='6' x2='18' y2='18' />
-    </svg>
-  );
+  const handleClear = () => {
+    setValidatedAddress('');
+    setIsDomain(false);
+    setTimeout(() => input.current?.focus());
+  };
 
   return (
     <Input
@@ -96,7 +98,7 @@ function AddressInput(props) {
           <SearchIcon />
         )
       }
-      suffix={validatedAddress && <Cross />}
+      suffix={validatedAddress && <CrossIcon onClick={handleClear} />}
       autoFocus={props.autoFocus}
       value={
         isDomain

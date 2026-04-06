@@ -1,23 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { alpha, useTheme } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import { useRouter } from 'next/router';
 
 const NavItem = ({ items }) => {
   const theme = useTheme();
-  const [activeLink, setActiveLink] = useState('');
-  useEffect(() => {
-    setActiveLink(window && window.location ? window.location.pathname : '');
-  }, []);
+  const router = useRouter();
+  const activeLink = router.pathname;
 
   return (
     <Box>
       <Grid container spacing={1}>
-        {items.map((p, i) => (
-          <Grid item key={i} xs={12}>
+        {items.map((p) => (
+          <Grid item key={p.href} xs={12}>
             <Button
               size={'large'}
               component={'a'}
@@ -57,14 +56,12 @@ const NavItem = ({ items }) => {
           </Grid>
         ))}
       </Grid>
-      
     </Box>
   );
 };
 
 NavItem.propTypes = {
   items: PropTypes.array.isRequired,
-  onClose: PropTypes.func,
 };
 
 export default NavItem;

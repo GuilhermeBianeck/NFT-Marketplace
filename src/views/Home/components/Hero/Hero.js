@@ -4,6 +4,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
+import { HERO_IMAGE_URL } from 'constants';
 
 const Hero = () => {
   const theme = useTheme();
@@ -12,7 +13,16 @@ const Hero = () => {
   });
 
   return (
-    <Box bgcolor={'alternate.main'} padding={{ xs: 2, md: 4 }} borderRadius={2}>
+    <Box
+      padding={{ xs: 3, md: 5 }}
+      borderRadius={3}
+      sx={{
+        background:
+          theme.palette.mode === 'light'
+            ? `linear-gradient(135deg, ${theme.palette.alternate.main} 0%, ${theme.palette.background.default} 100%)`
+            : `linear-gradient(135deg, ${theme.palette.alternate.main} 0%, ${theme.palette.background.paper} 100%)`,
+      }}
+    >
       <Grid container spacing={4}>
         <Grid
           item
@@ -26,34 +36,33 @@ const Hero = () => {
             <Box marginBottom={2}>
               <Typography
                 variant="h3"
-                component={'h3'}
-                sx={{
-                  fontWeight: 700,
-                }}
+                component="h1"
+                sx={{ fontWeight: 800, lineHeight: 1.2 }}
               >
-                Cuide, Preserve e Monitore Biomas através de NFTs e IoT
+                Care, Preserve and Monitor Biomes through NFTs and IoT
               </Typography>
             </Box>
+            <Typography
+              variant="h6"
+              component="p"
+              color="text.secondary"
+              sx={{ fontWeight: 400 }}
+            >
+              A platform for environmental preservation powered by blockchain technology.
+            </Typography>
           </Box>
         </Grid>
         <Grid item xs={12} md={6}>
-          <Box height={1} width={1} display={'flex'} justifyContent={'center'}>
-            <Box
-              height={1}
-              width={1}
-              maxWidth={{ xs: 600, md: '100%' }}
-              maxHeight={500}
-            >
+          <Box height={1} width={1} display="flex" justifyContent="center">
+            <Box height={1} width={1} maxWidth={{ xs: 600, md: '100%' }} maxHeight={500}>
               <Box
-                component={'img'}
-                src={
-                  'https://raw.githubusercontent.com/GuilhermeBianeck/NFT-Marketplace/refs/heads/main/images/biomacloud.svg'
-                }
+                component="img"
+                src={HERO_IMAGE_URL}
+                alt="Bioma Cloud platform illustration for biome preservation"
                 width={1}
                 height={1}
                 sx={{
-                  filter:
-                    theme.palette.mode === 'dark' ? 'brightness(0.8)' : 'none',
+                  filter: theme.palette.mode === 'dark' ? 'brightness(0.8)' : 'none',
                 }}
               />
             </Box>

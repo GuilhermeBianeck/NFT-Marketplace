@@ -7,184 +7,83 @@ import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 
+const NFTCard = ({ item, direction = 'column', theme }) => (
+  <Card
+    elevation={0}
+    sx={{
+      p: { xs: 2, sm: 4 },
+      height: 1,
+      display: 'flex',
+      flexDirection: { xs: 'column', sm: direction === 'column' ? 'column' : direction },
+      alignItems: direction === 'column' ? undefined : 'center',
+      justifyContent: direction === 'column' ? 'center' : undefined,
+      '&:hover': {
+        transform: 'translateY(-4px)',
+        boxShadow: theme.shadows[4],
+      },
+    }}
+  >
+    <Box sx={{ p: 4, mb: 2 }}>
+      <Box
+        component={LazyLoadImage}
+        effect="blur"
+        src={item.image}
+        alt={item.name || 'NFT image'}
+        width={1}
+        maxWidth={1}
+        sx={{
+          filter: theme.palette.mode === 'dark' ? 'brightness(0.7)' : 'none',
+        }}
+      />
+    </Box>
+    <Box>
+      <Typography
+        color="primary"
+        fontWeight={700}
+        variant="caption"
+        sx={{ textTransform: 'uppercase', letterSpacing: 0.5 }}
+      >
+        {item.price} POL
+      </Typography>
+      <Typography variant="h5" marginY={1}>
+        {item.name}
+      </Typography>
+      <Typography color="text.secondary">{item.description}</Typography>
+    </Box>
+  </Card>
+);
+
 const HomeGrid = ({ data = [] }) => {
   const theme = useTheme();
+  if (data.length === 0) return null;
+
   return (
     <Box>
       <Box marginBottom={4}>
         <Typography
-          sx={{
-            textTransform: 'uppercase',
-            fontWeight: 'medium',
-          }}
+          sx={{ textTransform: 'uppercase', fontWeight: 600, letterSpacing: 1 }}
           gutterBottom
-          color={'secondary'}
-          align={'center'}
+          color="secondary"
+          align="center"
+          variant="overline"
         >
-          Biomas Populares
+          Popular Biomes
         </Typography>
-        <Typography
-          variant="h4"
-          align={'center'}
-          data-aos={'fade-up'}
-          gutterBottom
-          sx={{
-            fontWeight: 700,
-          }}
-        >
-          Veja nossos Biomas Populares
+        <Typography variant="h4" align="center" data-aos="fade-up" gutterBottom>
+          Explore our Popular Biomes
         </Typography>
       </Box>
-      <Grid container spacing={{ xs: 2, sm: 4 }}>
+      <Grid container spacing={4}>
         <Grid item xs={12} md={5}>
-          {
-            data.map((item, i) => (
-              <Card
-                key={i}
-                elevation={3}
-                sx={{
-                  p: { xs: 2, sm: 4 },
-                  height: 1,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                }}
-              >
-                <Box sx={{ p: 4, mb: 2 }}>
-                  <Box
-                    component={LazyLoadImage}
-                    effect="blur"
-                    src={item.image}
-                    width={1}
-                    maxWidth={1}
-                    sx={{
-                      filter:
-                        theme.palette.mode === 'dark'
-                          ? 'brightness(0.5)'
-                          : 'none',
-                    }}
-                  />
-                </Box>
-                <Box>
-                  <Typography
-                    color={'primary'}
-                    fontWeight={700}
-                    variant={'caption'}
-                    sx={{ textTransform: 'uppercase' }}
-                  >
-                    {item.price} ETH
-                  </Typography>
-                  <Typography variant={'h5'} fontWeight={700} marginY={1}>
-                    {item.name}
-                  </Typography>
-                  <Typography color={'text.secondary'}>
-                    {item.description}
-                  </Typography>
-                </Box>
-              </Card>
-            ))[0]
-          }
+          {data[0] && <NFTCard item={data[0]} direction="column" theme={theme} />}
         </Grid>
-
         <Grid item xs={12} md={7}>
-          <Grid container spacing={{ xs: 2, sm: 4 }}>
+          <Grid container spacing={4}>
             <Grid item xs={12}>
-              {
-                data.map((item, i) => (
-                  <Card
-                    key={i}
-                    elevation={3}
-                    sx={{
-                      p: { xs: 2, sm: 4 },
-                      maxHeight: 1,
-                      display: 'flex',
-                      flexDirection: { xs: 'column', sm: 'row-reverse' },
-                      alignItems: 'center',
-                    }}
-                  >
-                    <Box sx={{ p: 4, mb: 2 }}>
-                      <Box
-                        component={LazyLoadImage}
-                        effect="blur"
-                        src={item.image}
-                        width={1}
-                        maxWidth={1}
-                        sx={{
-                          filter:
-                            theme.palette.mode === 'dark'
-                              ? 'brightness(0.5)'
-                              : 'none',
-                        }}
-                      />
-                    </Box>
-                    <Box>
-                      <Typography
-                        color={'primary'}
-                        fontWeight={700}
-                        variant={'caption'}
-                        sx={{ textTransform: 'uppercase' }}
-                      >
-                        {item.price} ETH
-                      </Typography>
-                      <Typography variant={'h5'} fontWeight={700} marginY={1}>
-                        {item.name}
-                      </Typography>
-                      <Typography color={'text.secondary'}>
-                        {item.description}
-                      </Typography>
-                    </Box>
-                  </Card>
-                ))[3]
-              }
+              {data[3] && <NFTCard item={data[3]} direction="row-reverse" theme={theme} />}
             </Grid>
-
             <Grid item xs={12}>
-              {
-                data.map((item, i) => (
-                  <Card
-                    elevation={3}
-                    sx={{
-                      p: { xs: 2, sm: 4 },
-                      maxHeight: 1,
-                      display: 'flex',
-                      flexDirection: { xs: 'column', sm: 'row' },
-                      alignItems: 'center',
-                    }}
-                  >
-                    <Box sx={{ p: 4, mb: 2 }}>
-                      <Box
-                        component={LazyLoadImage}
-                        effect="blur"
-                        src={item.image}
-                        width={1}
-                        maxWidth={1}
-                        sx={{
-                          filter:
-                            theme.palette.mode === 'dark'
-                              ? 'brightness(0.5)'
-                              : 'none',
-                        }}
-                      />
-                    </Box>
-                    <Box>
-                      <Typography
-                        color={'primary'}
-                        fontWeight={700}
-                        variant={'caption'}
-                        sx={{ textTransform: 'uppercase' }}
-                      >
-                        {item.price} ETH
-                      </Typography>
-                      <Typography variant={'h5'} fontWeight={700} marginY={1}>
-                        {item.name}
-                      </Typography>
-                      <Typography color={'text.secondary'}>
-                        {item.description}
-                      </Typography>
-                    </Box>
-                  </Card>
-                ))[2]
-              }
+              {data[2] && <NFTCard item={data[2]} direction="row" theme={theme} />}
             </Grid>
           </Grid>
         </Grid>
@@ -194,7 +93,7 @@ const HomeGrid = ({ data = [] }) => {
 };
 
 HomeGrid.propTypes = {
-  data: PropTypes.array,
+  data: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default HomeGrid;

@@ -14,14 +14,24 @@ task('accounts', 'Prints the list of accounts', async (taskArgs, hre) => {
 });
 
 module.exports = {
-  solidity: '0.8.4',
+  solidity: {
+    version: '0.8.20',
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200,
+      },
+    },
+  },
   networks: {
-    cardona: {
+    polygon: {
       url:
-        `https://polygonzkevm-cardona.g.alchemy.com/v2/${process.env.ALCHEMY_API}` ||
-        '',
+        process.env.ALCHEMY_API
+          ? `https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API}`
+          : 'https://polygon-bor-rpc.publicnode.com',
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      chainId: 137,
     },
   },
   gasReporter: {

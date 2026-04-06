@@ -7,58 +7,54 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { NavItem } from './components';
 import ThemeModeToggler from 'components/ThemeModeToggler';
 import Login from 'web3/Login';
+import { LOGO_URL } from 'constants';
 
-const Topbar = ({ onSidebarOpen, pages, colorInvert = false }) => {
+const Topbar = ({ onSidebarOpen, pages }) => {
   const theme = useTheme();
-  const { mode } = theme.palette;
+
   return (
     <Box
       display={'flex'}
       justifyContent={'space-between'}
       alignItems={'center'}
       width={1}
+      component="nav"
+      aria-label="Navegacao principal"
     >
       <Box
         display={'flex'}
         component="a"
         href="/"
-        title="Virtualground"
+        title="Bioma"
         width={{ xs: 100, md: 120 }}
       >
         <Box
           component={'img'}
-          src={
-            mode === 'light' && !colorInvert
-              ? 'https://raw.githubusercontent.com/GuilhermeBianeck/NFT-Marketplace/refs/heads/main/images/IoTTree.svg'
-              : 'https://raw.githubusercontent.com/GuilhermeBianeck/NFT-Marketplace/refs/heads/main/images/IoTTree.svg'
-          }
+          src={LOGO_URL}
+          alt="Bioma - Logo"
           height={0.5}
           width={0.5}
         />
       </Box>
       <Box sx={{ display: { xs: 'none', md: 'flex' } }} alignItems={'center'}>
-         <Box>
-           <NavItem
-             items={pages}
-             colorInvert={colorInvert}
-           />
-         </Box>
-         <Box marginLeft={4}>
-          <Login/>
-         </Box>
-         <Box marginLeft={4}>
-           <ThemeModeToggler />
-         </Box>
+        <Box>
+          <NavItem items={pages} />
+        </Box>
+        <Box marginLeft={4}>
+          <Login />
+        </Box>
+        <Box marginLeft={4}>
+          <ThemeModeToggler />
+        </Box>
       </Box>
-      
       <Box sx={{ display: { xs: 'flex', md: 'none' } }} alignItems={'center'}>
         <Box>
-          <Login/>
+          <Login />
         </Box>
         <Box marginLeft={1}>
           <Button
             onClick={() => onSidebarOpen()}
-            aria-label="Menu"
+            aria-label="Abrir menu"
             variant={'outlined'}
             sx={{
               borderRadius: 2,
@@ -78,7 +74,6 @@ const Topbar = ({ onSidebarOpen, pages, colorInvert = false }) => {
 Topbar.propTypes = {
   onSidebarOpen: PropTypes.func,
   pages: PropTypes.array,
-  colorInvert: PropTypes.bool,
 };
 
 export default Topbar;

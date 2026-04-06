@@ -16,7 +16,6 @@ export const useDarkMode = () => {
     } catch {
       /* do nothing */
     }
-
     setTheme(mode);
   };
 
@@ -31,7 +30,6 @@ export const useDarkMode = () => {
     } catch {
       setMode('light');
     }
-
     setMountedComponent(true);
   }, []);
 
@@ -39,8 +37,7 @@ export const useDarkMode = () => {
 };
 
 export default function Page({ children }) {
-  React.useEffect(() => {
-    // Remove the server-side injected CSS.
+  useEffect(() => {
     const jssStyles = document.querySelector('#jss-server-side');
     if (jssStyles) {
       jssStyles.parentElement.removeChild(jssStyles);
@@ -63,7 +60,6 @@ export default function Page({ children }) {
 
   return (
     <ThemeProvider theme={getTheme(themeMode, themeToggler)}>
-      {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
       <CssBaseline />
       <Paper elevation={0}>{children}</Paper>
     </ThemeProvider>
