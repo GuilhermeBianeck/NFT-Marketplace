@@ -16,10 +16,10 @@ import { useWallet } from 'web3/WalletContext';
 
 const Listings = () => {
   const theme = useTheme();
-  const { web3Provider } = useWallet();
+  const { isConnected, signer } = useWallet();
   const { nfts, loaded, error, reload } = useNFTLoader('fetchItemsListed', {
-    signer: web3Provider ? web3Provider.getSigner() : null,
-    autoLoad: !!web3Provider,
+    signer: signer || null,
+    autoLoad: isConnected,
   });
 
   return (
@@ -28,16 +28,16 @@ const Listings = () => {
         <Typography variant="h4" sx={{ mb: 2 }}>
           My Listings
         </Typography>
-        {!web3Provider && (
+        {!isConnected && (
           <Alert severity="info">Connect your wallet to view your listings.</Alert>
         )}
         {error && <Alert severity="error">{error}</Alert>}
-        {web3Provider && !loaded && !error && (
+        {isConnected && !loaded && !error && (
           <Box display="flex" justifyContent="center" py={8}>
             <CircularProgress />
           </Box>
         )}
-        {loaded && nfts.length === 0 && web3Provider && (
+        {loaded && nfts.length === 0 && isConnected && (
           <Box textAlign="center" py={2}>
             <Alert severity="info" sx={{ mb: 2 }}>You don't have any items listed yet.</Alert>
             <Button variant="contained" href="/assets">Go to My Assets</Button>

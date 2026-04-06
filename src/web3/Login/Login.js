@@ -1,29 +1,62 @@
-import { IconButton, Tooltip } from '@mui/material';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { useAccount } from 'wagmi';
+import usePendingBalance from 'hooks/usePendingBalance';
+import useMarketplace from 'hooks/useMarketplace';
+import { useCallback, useState } from 'react';
+import { Button, CircularProgress, Box, Tooltip } from '@mui/material';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import Account from './components/Account';
-import { useWallet } from 'web3/WalletContext';
-import { ellipseAddress } from './lib/utilities';
 
 export const Login = () => {
-  const { web3Provider, address, connect, disconnect } = useWallet();
+  const { isConnected } = useAccount();
+  const { balance, refresh } = usePendingBalance();
+  const contract = useMarketplace({ requireSigner: true });
+  const [withdrawing, setWithdrawing] = useState(false);
+
+  const handleWithdraw = useCallback(async () => {
+    if (!contract) return;
+    try {
+      setWithdrawing(true);
+      const tx = await contract.withdraw();
+      await tx.wait();
+      refresh();
+    } catch (err) {
+      console.error('Withdraw error:', err);
+    } finally {
+      setWithdrawing(false);
+    }
+  }, [contract, refresh]);
+
+  const hasBalance = parseFloat(balance) > 0;
 
   return (
-    <div className="container">
-      {web3Provider ? (
-        <Account
-          icon={`https://api.dicebear.com/5.x/identicon/svg?seed=${address}`}
-          address={ellipseAddress(address)}
-          fullAddress={address}
-          handleLogout={disconnect}
-        />
-      ) : (
-        <Tooltip title="Connect Wallet">
-          <IconButton color="primary" onClick={connect} size="medium" aria-label="Connect Wallet">
-            <AccountBalanceWalletIcon fontSize="large" />
-          </IconButton>
+    <Box display="flex" alignItems="center" gap={1}>
+      {isConnected && hasBalance && (
+        <Tooltip title="Withdraw funds">
+          <Button
+            size="small"
+            variant="contained"
+            color="secondary"
+            onClick={handleWithdraw}
+            disabled={withdrawing}
+            startIcon={
+              withdrawing ? (
+                <CircularProgress size={14} color="inherit" />
+              ) : (
+                <AccountBalanceWalletIcon fontSize="small" />
+              )
+            }
+            sx={{ fontSize: '0.75rem', py: 0.5 }}
+          >
+            {balance} POL
+          </Button>
         </Tooltip>
       )}
-    </div>
+      <ConnectButton
+        chainStatus="icon"
+        showBalance={false}
+        accountStatus={{ smallScreen: 'avatar', largeScreen: 'full' }}
+      />
+    </Box>
   );
 };
 

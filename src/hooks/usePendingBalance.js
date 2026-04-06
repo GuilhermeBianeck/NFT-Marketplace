@@ -10,7 +10,7 @@ export default function usePendingBalance() {
   const [loading, setLoading] = useState(false);
 
   const refresh = useCallback(async () => {
-    if (!address) {
+    if (!address || !contract) {
       setBalance('0');
       return;
     }
