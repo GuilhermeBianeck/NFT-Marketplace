@@ -1,10 +1,37 @@
-import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { useState, useEffect, useCallback } from 'react';
 import { useWallet } from 'web3/WalletContext';
 import usePendingBalance from 'hooks/usePendingBalance';
 import useMarketplace from 'hooks/useMarketplace';
-import { useCallback, useState } from 'react';
-import { Button, CircularProgress, Box, Tooltip } from '@mui/material';
+import { Button, CircularProgress, Box, Tooltip, IconButton } from '@mui/material';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+
+function ConnectButtonWrapper() {
+  const [RKButton, setRKButton] = useState(null);
+
+  useEffect(() => {
+    import('@rainbow-me/rainbowkit').then((mod) => {
+      setRKButton(() => mod.ConnectButton);
+    });
+  }, []);
+
+  if (!RKButton) {
+    return (
+      <Tooltip title="Connect Wallet">
+        <IconButton color="primary" size="medium" aria-label="Connect Wallet">
+          <AccountBalanceWalletIcon fontSize="large" />
+        </IconButton>
+      </Tooltip>
+    );
+  }
+
+  return (
+    <RKButton
+      chainStatus="icon"
+      showBalance={false}
+      accountStatus={{ smallScreen: 'avatar', largeScreen: 'full' }}
+    />
+  );
+}
 
 export const Login = () => {
   const { isConnected } = useWallet();
@@ -28,45 +55,32 @@ export const Login = () => {
 
   const hasBalance = parseFloat(balance) > 0;
 
-  // RainbowKit ConnectButton handles its own loading state gracefully
-  // If provider isn't loaded yet, just show a placeholder
-  if (typeof window === 'undefined') return null;
-
-  try {
-    return (
-      <Box display="flex" alignItems="center" gap={1}>
-        {isConnected && hasBalance && (
-          <Tooltip title="Withdraw funds">
-            <Button
-              size="small"
-              variant="contained"
-              color="secondary"
-              onClick={handleWithdraw}
-              disabled={withdrawing}
-              startIcon={
-                withdrawing ? (
-                  <CircularProgress size={14} color="inherit" />
-                ) : (
-                  <AccountBalanceWalletIcon fontSize="small" />
-                )
-              }
-              sx={{ fontSize: '0.75rem', py: 0.5 }}
-            >
-              {balance} POL
-            </Button>
-          </Tooltip>
-        )}
-        <ConnectButton
-          chainStatus="icon"
-          showBalance={false}
-          accountStatus={{ smallScreen: 'avatar', largeScreen: 'full' }}
-        />
-      </Box>
-    );
-  } catch {
-    // If RainbowKit context isn't available yet
-    return null;
-  }
+  return (
+    <Box display="flex" alignItems="center" gap={1}>
+      {isConnected && hasBalance && (
+        <Tooltip title="Withdraw funds">
+          <Button
+            size="small"
+            variant="contained"
+            color="secondary"
+            onClick={handleWithdraw}
+            disabled={withdrawing}
+            startIcon={
+              withdrawing ? (
+                <CircularProgress size={14} color="inherit" />
+              ) : (
+                <AccountBalanceWalletIcon fontSize="small" />
+              )
+            }
+            sx={{ fontSize: '0.75rem', py: 0.5 }}
+          >
+            {balance} POL
+          </Button>
+        </Tooltip>
+      )}
+      <ConnectButtonWrapper />
+    </Box>
+  );
 };
 
 export default Login;

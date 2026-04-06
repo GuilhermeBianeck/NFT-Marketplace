@@ -10,17 +10,17 @@ import 'slick-carousel/slick/slick-theme.css';
 import 'react-image-lightbox/style.css';
 import 'aos/dist/aos.css';
 
-function Web3ProviderWrapper({ children }) {
-  const [Provider, setProvider] = useState(null);
+function ClientOnlyWeb3({ children }) {
+  const [Providers, setProviders] = useState(null);
 
   useEffect(() => {
     import('../web3/Web3Providers').then((mod) => {
-      setProvider(() => mod.default);
+      setProviders(() => mod.default);
     });
   }, []);
 
-  if (!Provider) return <>{children}</>;
-  return <Provider>{children}</Provider>;
+  if (!Providers) return <>{children}</>;
+  return <Providers>{children}</Providers>;
 }
 
 export default function App({ Component, pageProps }) {
@@ -33,13 +33,13 @@ export default function App({ Component, pageProps }) {
         />
         <title>Bioma</title>
       </Head>
-      <Web3ProviderWrapper>
+      <ClientOnlyWeb3>
         <Page>
           <ErrorBoundary>
             <Component {...pageProps} />
           </ErrorBoundary>
         </Page>
-      </Web3ProviderWrapper>
+      </ClientOnlyWeb3>
     </React.Fragment>
   );
 }
