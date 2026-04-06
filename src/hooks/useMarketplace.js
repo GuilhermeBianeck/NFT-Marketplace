@@ -17,8 +17,12 @@ export default function useMarketplace({ requireSigner = false } = {}) {
 
     if (typeof window === 'undefined') return null;
 
-    const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
-    return new ethers.Contract(address, Marketplace.abi, provider);
+    try {
+      const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
+      return new ethers.Contract(address, Marketplace.abi, provider);
+    } catch {
+      return null;
+    }
   }, [signer, requireSigner]);
 
   return contract;
