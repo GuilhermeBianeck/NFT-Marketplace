@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { ethers } from 'ethers';
 import Marketplace from 'contracts/Marketplace.sol/Marketplace.json';
-import { RPC_URL, MARKETPLACE_ADDRESS } from 'constants';
+import { RPC_URL, MARKETPLACE_ADDRESS } from 'config';
 import { useWallet } from 'web3/WalletContext';
 
 export default function useMarketplace({ requireSigner = false } = {}) {

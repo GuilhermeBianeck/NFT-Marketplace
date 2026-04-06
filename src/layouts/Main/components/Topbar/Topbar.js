@@ -7,7 +7,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { NavItem } from './components';
 import ThemeModeToggler from 'components/ThemeModeToggler';
 import Login from 'web3/Login';
-import { LOGO_URL } from 'constants';
+import { LOGO_URL } from 'config';
 
 const Topbar = ({ onSidebarOpen, pages }) => {
   const theme = useTheme();

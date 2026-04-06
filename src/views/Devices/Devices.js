@@ -13,7 +13,7 @@ import Marketplace from 'contracts/Marketplace.sol/Marketplace.json';
 import axios from 'axios';
 import ItemCard from './components/ItemCard';
 import Chart from './components/Chart';
-import { RPC_URL, MARKETPLACE_ADDRESS, POLLING_INTERVAL } from 'constants';
+import { RPC_URL, MARKETPLACE_ADDRESS, POLLING_INTERVAL } from 'config';
 
 export default function DevicesItem({ tokenId }) {
   const theme = useTheme();

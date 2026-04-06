@@ -20,7 +20,7 @@ import web3 from 'web3';
 import { ethers } from 'ethers';
 import { create } from 'ipfs-http-client';
 import Marketplace from 'contracts/Marketplace.sol/Marketplace.json';
-import { MARKETPLACE_ADDRESS } from 'constants';
+import { MARKETPLACE_ADDRESS } from 'config';
 import { useWallet } from 'web3/WalletContext';
 import Web3Modal from 'web3modal';
 

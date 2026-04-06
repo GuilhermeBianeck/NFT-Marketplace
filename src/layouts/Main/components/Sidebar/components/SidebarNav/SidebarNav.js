@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import NavItem from './components/NavItem';
 import Login from 'web3/Login';
-import { LOGO_URL } from 'constants';
+import { LOGO_URL } from 'config';
 
 const SidebarNav = ({ pages }) => {
   return (

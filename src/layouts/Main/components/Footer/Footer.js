@@ -3,7 +3,7 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
-import { LOGO_URL } from 'constants';
+import { LOGO_URL } from 'config';
 
 const Footer = () => {
   return (
