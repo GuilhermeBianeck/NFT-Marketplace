@@ -183,7 +183,7 @@ const PortfolioGrid = ({ data = [], buttonShow, onRefresh, showSellerActions, sh
                 )}
               </CardContent>
               <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
-                <Button size="small" onClick={() => router.push(`/devices/${item.tokenId}`)}>
+                <Button size="small" onClick={() => router.push(`/biome/${item.tokenId}`)}>
                   Details
                 </Button>
                 <Box display="flex" gap={0.5} alignItems="center">

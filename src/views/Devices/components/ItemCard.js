@@ -1,66 +1,86 @@
 import React from 'react';
 import Box from '@mui/material/Box';
-import { CardContent, Typography, Card, Link } from '@mui/material';
-import CardMedia from '@mui/material/CardMedia';
+import { CardContent, Typography, Card, Link, Chip } from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
-
+import DevicesIcon from '@mui/icons-material/Sensors';
 
 export default function ItemCard({ nft }) {
+  if (!nft) return null;
+
   return (
-    <Box display={'block'} width={1} height={1}>
+    <Card
+      sx={{
+        display: 'flex',
+        flexDirection: { xs: 'column', md: 'row' },
+        overflow: 'hidden',
+      }}
+    >
       <Box
-        component={Card}
-        width={1}
-        height={1}
-        display={'flex'}
-        flexDirection={'column'}
+        sx={{
+          width: { xs: '100%', md: '40%' },
+          minHeight: { xs: 250, md: 350 },
+          position: 'relative',
+          bgcolor: 'background.level2',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
       >
-        <CardMedia
-          title={nft?.name}
-          image={nft?.image}
-          sx={{
-            position: 'relative',
-            height: { xs: 240, sm: 340, md: 280 },
-            overflow: 'hidden',
-          }}
-        >
+        {nft.image ? (
           <Box
-            display={'flex'}
-            justifyContent={'space-between'}
-            position={'absolute'}
-            bottom={0}
-            padding={2}
-            width={1}
-          >
-            <Box
-              padding={1}
-              bgcolor={'background.paper'}
-              boxShadow={1}
-              borderRadius={2}
-            >
-              <Typography sx={{ fontWeight: 600 }}>
-                {nft?.price} POL
-              </Typography>
-            </Box>
-          </Box>
-        </CardMedia>
-        <CardContent>
-          <Typography variant={'h6'} align={'left'} sx={{ fontWeight: 700 }}>
-            {nft?.name}
-          </Typography>
-          <Box display={'flex'} alignItems={'center'} marginY={2}>
-            <Typography variant={'subtitle2'} color="text.secondary">
-              {nft?.description}
-            </Typography>
-          </Box>
-          <Box display={'flex'} alignItems={'center'} gap={0.5}>
+            component="img"
+            src={nft.image}
+            alt={nft.name || 'Biome image'}
+            sx={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+            }}
+          />
+        ) : (
+          <Typography color="text.secondary">No image</Typography>
+        )}
+      </Box>
+      <CardContent sx={{ flex: 1, p: { xs: 3, md: 4 }, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>
+          {nft.name}
+        </Typography>
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+          {nft.description}
+        </Typography>
+        <Box display="flex" gap={1} flexWrap="wrap" mb={2}>
+          {nft.price && (
+            <Chip label={`${nft.price} POL`} color="primary" size="small" />
+          )}
+          {nft.deviceUID && (
+            <Chip
+              icon={<DevicesIcon />}
+              label={`Device: ${nft.deviceUID}`}
+              variant="outlined"
+              size="small"
+            />
+          )}
+          {nft.sold !== undefined && (
+            <Chip
+              label={nft.sold ? 'Sold' : 'For Sale'}
+              color={nft.sold ? 'default' : 'success'}
+              size="small"
+              variant="outlined"
+            />
+          )}
+        </Box>
+        {nft.address && nft.address.length > 0 && (
+          <Box display="flex" alignItems="center" gap={0.5}>
             <LinkIcon sx={{ width: 16, height: 16, color: 'text.secondary' }} />
-            <Link href={nft?.address} underline="hover" variant="subtitle2" color="text.secondary">
-              Link to NFT
+            <Link href={nft.address} underline="hover" variant="body2" color="text.secondary" target="_blank" rel="noopener">
+              External Link
             </Link>
           </Box>
-        </CardContent>
-      </Box>
-    </Box>
+        )}
+      </CardContent>
+    </Card>
   );
 }

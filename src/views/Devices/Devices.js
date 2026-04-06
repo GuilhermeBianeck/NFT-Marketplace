@@ -3,8 +3,9 @@ import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
-
 import CircularProgress from '@mui/material/CircularProgress';
+import Chip from '@mui/material/Chip';
+
 import Main from 'layouts/Main';
 import Container from 'components/Container';
 import Contact from 'components/Contact';
@@ -16,10 +17,10 @@ import ItemCard from './components/ItemCard';
 import Chart from './components/Chart';
 import { RPC_URL, MARKETPLACE_ADDRESS, POLLING_INTERVAL } from 'config';
 
-export default function DevicesItem({ tokenId }) {
+export default function BiomeDetail({ tokenId }) {
   const theme = useTheme();
   const [nft, setNft] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [data, setData] = useState([]);
 
@@ -31,23 +32,25 @@ export default function DevicesItem({ tokenId }) {
       );
       setData(result.data);
     } catch (err) {
-      console.error('Error fetching data:', err);
+      console.error('Error fetching sensor data:', err);
     }
   }, []);
 
-  const loadNFTs = useCallback(async () => {
-    if (!tokenId) return;
+  const loadNFT = useCallback(async () => {
+    const addr = MARKETPLACE_ADDRESS?.trim();
+    if (!tokenId || !addr) return;
     setLoading(true);
     setError(null);
     try {
       const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
-      const marketContract = new ethers.Contract(
-        MARKETPLACE_ADDRESS,
-        Marketplace.abi,
-        provider,
-      );
+      const contract = new ethers.Contract(addr, Marketplace.abi, provider);
 
-      const tokenUri = await marketContract.tokenURI(String(tokenId));
+      // Fetch on-chain data and metadata in parallel
+      const [tokenUri, marketItem] = await Promise.all([
+        contract.tokenURI(String(tokenId)),
+        contract.getMarketItem(tokenId).catch(() => null),
+      ]);
+
       const meta = await axios.get(tokenUri);
 
       if (meta.data.deviceUID) {
@@ -61,62 +64,70 @@ export default function DevicesItem({ tokenId }) {
         description: meta.data.description,
         address: meta.data.address,
         deviceUID: meta.data.deviceUID,
+        sensorType: meta.data.sensorType,
+        price: marketItem ? ethers.utils.formatEther(marketItem.price) : null,
+        seller: marketItem?.seller,
+        owner: marketItem?.owner,
+        sold: marketItem?.sold,
       });
     } catch (err) {
-      console.error('Error loading NFT:', err);
-      setError('Unable to load device data. Please try again.');
+      console.error('Error loading biome:', err);
+      setError('Unable to load biome data. Please try again.');
     } finally {
       setLoading(false);
     }
   }, [tokenId, getData]);
 
   useEffect(() => {
-    loadNFTs();
-  }, [loadNFTs]);
+    loadNFT();
+  }, [loadNFT]);
 
   useEffect(() => {
     if (!nft?.deviceUID) return;
-    getData(nft.deviceUID);
     const interval = setInterval(() => getData(nft.deviceUID), POLLING_INTERVAL);
     return () => clearInterval(interval);
   }, [nft?.deviceUID, getData]);
 
   return (
     <Main>
-      <Container paddingY={'0 !important'}>
-        <Typography
-          variant={'h4'}
-          align={'left'}
-          sx={{ fontWeight: 700, marginBottom: 3 }}
-        >
-          Dashboard
-        </Typography>
-        {error && (
-          <Alert severity="error" sx={{ marginBottom: 2 }}>
-            {error}
-          </Alert>
-        )}
-        {loading && !nft && (
+      <Container>
+        {loading && (
           <Box display="flex" justifyContent="center" py={8}>
             <CircularProgress />
           </Box>
         )}
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>
+        )}
         {nft && (
           <>
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={3} flexWrap="wrap" gap={1}>
+              <Typography variant="h4">
+                {nft.name}
+              </Typography>
+              <Box display="flex" gap={1}>
+                {nft.price && (
+                  <Chip label={`${nft.price} POL`} color="primary" />
+                )}
+                {nft.deviceUID && (
+                  <Chip label={nft.sensorType || 'Sensor'} variant="outlined" size="small" />
+                )}
+              </Box>
+            </Box>
             <ItemCard nft={nft} />
-            <Box sx={{ height: 20 }} />
+            <Box sx={{ height: 24 }} />
             {data.length > 0 ? (
-              <Chart deviceUID={nft?.deviceUID} data={data} />
+              <Chart deviceUID={nft.deviceUID} data={data} />
             ) : (
-              !loading && (
-                <Alert severity="info">No sensor data available for this device yet.</Alert>
+              !loading && nft.deviceUID && (
+                <Alert severity="info" sx={{ mb: 2 }}>No sensor data available for this device yet.</Alert>
               )
             )}
           </>
         )}
       </Container>
       <Box
-        position={'relative'}
+        position="relative"
         marginTop={{ xs: 4, md: 6 }}
         sx={{ backgroundColor: theme.palette.alternate.main }}
       >
