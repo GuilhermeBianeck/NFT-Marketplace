@@ -1,33 +1,8 @@
-import { createContext, useContext, useCallback, useEffect, useReducer } from 'react';
+import { createContext, useContext, useCallback, useEffect, useReducer, useState } from 'react';
 import { providers } from 'ethers';
-import WalletConnectProvider from '@walletconnect/web3-provider';
-import WalletLink from '@coinbase/wallet-sdk';
 import Web3Modal from 'web3modal';
 
 const WalletContext = createContext(null);
-
-const providerOptions = {
-  walletconnect: {
-    package: WalletConnectProvider,
-    package: WalletLink,
-    connector: async (_, options) => {
-      const { appName, networkUrl, chainId } = options;
-      const walletLink = new WalletLink({ appName });
-      const provider = walletLink.makeWeb3Provider(networkUrl, chainId);
-      await provider.enable();
-      return provider;
-    },
-  },
-};
-
-let web3Modal;
-if (typeof window !== 'undefined') {
-  web3Modal = new Web3Modal({
-    network: 'matic',
-    cacheProvider: true,
-    providerOptions,
-  });
-}
 
 const initialState = {
   provider: null,
@@ -57,40 +32,68 @@ function reducer(state, action) {
   }
 }
 
+function getWeb3Modal() {
+  if (typeof window === 'undefined') return null;
+  return new Web3Modal({
+    network: 'matic',
+    cacheProvider: true,
+  });
+}
+
 export function WalletProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [mounted, setMounted] = useState(false);
   const { provider, web3Provider, address, chainId } = state;
 
-  const connect = useCallback(async () => {
-    const provider = await web3Modal.connect();
-    const web3Provider = new providers.Web3Provider(provider);
-    const signer = web3Provider.getSigner();
-    const address = await signer.getAddress();
-    const network = await web3Provider.getNetwork();
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-    dispatch({
-      type: 'SET_WEB3_PROVIDER',
-      provider,
-      web3Provider,
-      address,
-      chainId: network.chainId,
-    });
+  const connect = useCallback(async () => {
+    try {
+      const modal = getWeb3Modal();
+      if (!modal) return;
+      const rawProvider = await modal.connect();
+      const web3Provider = new providers.Web3Provider(rawProvider);
+      const signer = web3Provider.getSigner();
+      const addr = await signer.getAddress();
+      const network = await web3Provider.getNetwork();
+
+      dispatch({
+        type: 'SET_WEB3_PROVIDER',
+        provider: rawProvider,
+        web3Provider,
+        address: addr,
+        chainId: network.chainId,
+      });
+    } catch (err) {
+      console.error('Wallet connect error:', err);
+    }
   }, []);
 
   const disconnect = useCallback(async () => {
-    await web3Modal.clearCachedProvider();
-    if (provider?.disconnect && typeof provider.disconnect === 'function') {
-      await provider.disconnect();
+    try {
+      const modal = getWeb3Modal();
+      if (modal) await modal.clearCachedProvider();
+      if (provider?.disconnect && typeof provider.disconnect === 'function') {
+        await provider.disconnect();
+      }
+      dispatch({ type: 'RESET_WEB3_PROVIDER' });
+    } catch (err) {
+      console.error('Wallet disconnect error:', err);
     }
-    dispatch({ type: 'RESET_WEB3_PROVIDER' });
   }, [provider]);
 
+  // Auto connect to cached provider (client-side only)
   useEffect(() => {
-    if (web3Modal.cachedProvider) {
+    if (!mounted) return;
+    const modal = getWeb3Modal();
+    if (modal?.cachedProvider) {
       connect();
     }
-  }, [connect]);
+  }, [mounted, connect]);
 
+  // Listen for account/chain changes
   useEffect(() => {
     if (provider?.on) {
       const handleAccountsChanged = (accounts) => {
